@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Shared build, level and gear planner for a four-player Baldur's Gate 3 Honour Mode party.">
+<title>BG3 Party Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one column, max 1080px; sticky tab bar; each page is a stack of sections.
+   Ground is a cool lichen-grey, like a field journal; each character has its own ink. */
+:root{
+  --bg:#EDEFEA; --surface:#F8F9F6; --sunk:#E3E7E1; --line:#C9D0C6; --ink:#19211E; --muted:#535E58;
+  --accent:#2C5C50; --accent-ink:#F8F9F6; --danger:#A3392A;
+  --sorc:#2B5D8C; --druid:#4A6726; --assassin:#674C8C; --cleric:#8E620C;
+  --f-display:"Alegreya SC", "Palatino Linotype", Georgia, serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#131917; --surface:#1B2320; --sunk:#222C28; --line:#34413C; --ink:#E5EBE7; --muted:#A1ADA6;
+  --accent:#86C3B1; --accent-ink:#131917; --danger:#EC8B7C;
+  --sorc:#86B6E4; --druid:#A9C97D; --assassin:#BDA6E4; --cleric:#E3BA62; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#131917; --surface:#1B2320; --sunk:#222C28; --line:#34413C; --ink:#E5EBE7; --muted:#A1ADA6;
+  --accent:#86C3B1; --accent-ink:#131917; --danger:#EC8B7C;
+  --sorc:#86B6E4; --druid:#A9C97D; --assassin:#BDA6E4; --cleric:#E3BA62; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:0 64px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0;line-height:1.1}
+h1{font-size:clamp(34px,6vw,52px)}
+h2{font-size:clamp(24px,4vw,30px)}
+h3{font-size:20px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+p{margin:0;max-width:68ch}
+
+/* tab bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar-in{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tab{appearance:none;font:inherit;font-size:15px;font-weight:700;min-height:42px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.tab:hover{border-color:var(--ink)}
+.tab[aria-current="page"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--c);flex-shrink:0}
+.status{margin-left:auto;font-family:var(--f-mono);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.status .pip{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.status.live .pip{background:var(--druid)}
+@media (max-width:640px){.status{margin-left:0;width:100%}}
+
+.page{display:flex;flex-direction:column;gap:28px;padding-top:28px}
+.head{display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+.subtabs{display:flex;flex-wrap:wrap;gap:6px}
+.notice{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--surface);padding:12px 16px;border-radius:6px;font-size:15px}
+.notice[data-kind="warn"]{border-left-color:var(--cleric)}
+
+/* party cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.pc{background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--c);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.pc .role{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--c);font-weight:600}
+.pc h3{font-size:24px}
+.pc .cls{font-size:14.5px;color:var(--muted)}
+.meter{height:8px;border-radius:4px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--c)}
+.pc .count{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.player{display:flex;flex-direction:column;gap:4px}
+.player label{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+input,select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:9px 10px;min-height:42px;width:100%;min-width:0}
+textarea{min-height:76px;resize:vertical}
+input[type="checkbox"]{width:22px;height:22px;min-height:0;padding:0;accent-color:var(--accent);flex-shrink:0}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px;align-items:start}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.box > .eyebrow{margin-bottom:2px}
+ul.list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+ul.list li{padding-left:16px;position:relative;font-size:15px;line-height:1.45;color:var(--muted)}
+ul.list li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+ul.list b,.kv b,.tbl b{color:var(--ink)}
+.kv{display:flex;flex-direction:column}
+.kv div{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.kv dt,.kv .k{font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+.kv .v{color:var(--muted)}
+@media (max-width:480px){.kv div{grid-template-columns:1fr;gap:2px}}
+.stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.stat{border:1px solid var(--line);border-radius:6px;padding:8px 2px;text-align:center;background:var(--bg)}
+.stat.hi{border-color:var(--c);border-width:2px}
+.stat span{display:block;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.stat strong{font-family:var(--f-display);font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums}
+
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.tbl{width:100%;border-collapse:collapse;font-size:15px}
+.tbl th{text-align:left;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:10px 14px;border-bottom:1px solid var(--line)}
+.tbl td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:top;color:var(--muted)}
+.tbl td:first-child{font-family:var(--f-mono);color:var(--c,var(--accent));font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tbl td:nth-child(2){color:var(--ink);font-weight:700;white-space:nowrap}
+.tbl.plain td:first-child{font-family:var(--f-body);color:var(--ink);white-space:normal}
+.tbl.plain td:nth-child(2){font-weight:400;white-space:nowrap}
+
+/* gear */
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--c);border:1px solid var(--c);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.slot{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.opt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--line);border-radius:4px;padding:1px 5px}
+.act{display:flex;flex-direction:column;gap:12px}
+.act-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.act-h p{font-size:14px;color:var(--muted)}
+.stop{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.stop-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:12px 16px;background:var(--sunk)}
+.stop-h h3{font-family:var(--f-body);font-size:17px;font-weight:700}
+.stop-h .detail{font-size:14px;color:var(--muted)}
+.stop-h .tools{margin-left:auto;display:flex;gap:4px}
+.item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding:12px 16px;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item .main{display:flex;flex-direction:column;gap:3px;min-width:0}
+.item .line1{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.item .name{font-weight:700;font-size:16px}
+.item.got .name{text-decoration:line-through;text-decoration-thickness:2px;color:var(--muted)}
+.item .how{font-size:14.5px;color:var(--muted)}
+.item .where{font-size:14px;font-weight:700}
+.item .acts{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.check{display:flex;align-items:center;min-height:28px}
+.ibtn{appearance:none;font:inherit;font-size:13px;font-weight:700;min-height:36px;min-width:36px;padding:0 10px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.ibtn:hover{border-color:var(--ink)}
+.ibtn.danger{color:var(--danger);border-color:var(--danger)}
+.ibtn:disabled{opacity:.4;cursor:default}
+.btn{appearance:none;font:inherit;font-weight:700;font-size:15px;min-height:44px;padding:0 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.empty{padding:18px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:15px}
+.confirm{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;color:var(--danger);font-weight:700}
+@media (max-width:560px){
+  .item{grid-template-columns:auto minmax(0,1fr)}
+  .item .acts{grid-column:2;justify-content:flex-start}
+}
+
+/* sheet (add/edit form) */
+.scrim{position:fixed;inset:0;background:rgba(10,14,12,.5);z-index:20;display:flex;align-items:flex-end;justify-content:center;padding:16px}
+@media (min-width:700px){.scrim{align-items:center}}
+.sheet{background:var(--surface);color:var(--ink);border-radius:12px;width:min(560px,100%);max-height:calc(100% - 16px);overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px;border:1px solid var(--line)}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label,.field .lab{font-size:13px;font-weight:700;letter-spacing:.03em}
+.field .hint{font-size:13px;color:var(--muted)}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.inline{display:flex;align-items:center;gap:10px;font-size:15px}
+.err{color:var(--danger);font-size:14px;font-weight:700}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:700;font-size:14px;z-index:30;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion:no-preference){.tab,.ibtn,.btn{transition:border-color .15s,background .15s}}
+</style>
+</head>
+<body>
+<header class="bar"><nav class="bar-in" id="nav" aria-label="Pages"></nav></header>
+<main class="wrap" id="app"></main>
+<div id="sheetHost"></div>
+<div id="toastHost" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+/* ---------- Supabase ----------
+   Anyone can read. Every change goes through a Postgres function that checks the party passcode;
+   Row Level Security blocks direct writes. The key below is the public (anon) key, safe to publish. */
+const SUPABASE_URL='https://blfgzzmmnbeswlmcleqa.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsZmd6em1tbmJlc3dsbWNsZXFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NDU3NDMsImV4cCI6MjEwNzIyMTc0M30.jPa2kQSMP65C_d6xj0-qbUcF3LqJIBlCh_hnlHChwh8';
+const PASS_KEY='bg3-party-passcode';
+
+const CH={
+ S:{key:'S',slug:'sorcerer',name:'Cold Sorcerer',v:'--sorc'},
+ D:{key:'D',slug:'druid',name:'Moon Druid',v:'--druid'},
+ A:{key:'A',slug:'assassin',name:'Gloomstalker Assassin',v:'--assassin'},
+ C:{key:'C',slug:'cleric',name:'Light Cleric',v:'--cleric'}};
+const ORDER=['S','D','A','C'];
+const SLOTS=['Head','Cloak','Armour','Gloves','Boots','Amulet','Ring','Main hand','Off hand','Shield','Staff','Bow','Ranged','Other'];
+const ACTNOTE={1:'Everything here is locked off once you leave for Act 2. Clear the list before the Mountain Pass or Underdark exit.',2:'Act 2 ends when you enter the Mind Flayer Colony. Get Moonrise and Gauntlet loot first.',3:'Mostly shops in the Lower City. Bring gold.'};
+
+const BUILD={
+S:{role:'Area damage & control',line:'Draconic Sorcerer 11 / Tempest Cleric 1 (or Sorcerer 12)',blurb:'Freezes the battlefield with spell-slot-free Ray of Frost, then Twins and Quickens for double casts.',
+ guide:['https://gamestegy.com/post/bg3/998/cold-sorcerer-build','Gamestegy: Best Cold Sorcerer Build'],race:'High Half-Elf',
+ create:[['Race','High Half-Elf (extra cantrip, shield proficiency). Halfling or Human also work.'],['Class','Sorcerer: <b>Draconic Bloodline, White (Cold)</b> ancestry'],['Background','Guild Artisan: Insight, Persuasion'],['Skills','Deception, Intimidation, Persuasion, Performance'],['Cantrips','Friends, Ray of Frost, Fire Bolt, Shocking Grasp'],['Spells','Magic Missile, Sleep']],
+ stats:{STR:8,DEX:16,CON:14,INT:8,WIS:10,CHA:17},hi:['DEX','CHA'],statNote:"If you won't use Auntie Ethel's hair (+1 CHA), stop CHA at 16 and put the spare points in WIS.",
+ play:['<b>Ray of Frost is the engine.</b> It costs no slots; your gear stacks cold damage and Chilled on it.','<b>Wet + cold doubles damage.</b> Get enemies Wet first (Create Water from the Druid or Cleric, or a water bottle shot with a hand crossbow), then freeze them.','<b>Twin and Quicken.</b> Twinned Ray of Frost or Chain Lightning hits two targets; Quickened Spell lets you cast twice a turn (three with Haste).','<b>Hold, then crit.</b> Hold Person or Hold Monster, then Ray of Frost from close range for guaranteed crits.','<b>Control:</b> Sleet Storm and Ice Storm make icy ground that knocks enemies prone.','<b>Counterspell</b> is your reaction in boss fights.'],
+ levels:[['01','Sorcerer 1','Draconic Bloodline, White (Cold). Stats and picks above.'],['02','Sorcerer 2','Spell: <b>Chromatic Orb</b>. Metamagic: <b>Twinned, Extended</b>.'],['03','Sorcerer 3','Spell: Cloud of Daggers. Metamagic: <b>Quickened</b>.'],['04','Sorcerer 4','Cantrip: Minor Illusion. Spell: <b>Shield</b>. Swap Sleep for <b>Hold Person</b>. Feat: <b>+2 CHA</b>.'],['05','Sorcerer 5','Spell: <b>Sleet Storm</b>.'],['06','Cleric 1','Respec so Cleric is level 1. <b>Tempest Domain</b>; Light, Thaumaturgy, Resistance; prepare <b>Create or Destroy Water</b>. Optional, see below.'],['07','Sorcerer 6','Elemental Affinity (extra cold damage). Spell: <b>Counterspell</b>. Swap Cloud of Daggers for <b>Haste</b>.'],['08','Sorcerer 7','Spell: <b>Ice Storm</b>.'],['09','Sorcerer 8','Spell: Lightning Bolt or Confusion. Feat: <b>Alert</b> (or Dual Wielder without a shield).'],['10','Sorcerer 9','Spell: <b>Cone of Cold</b>.'],['11','Sorcerer 10','Cantrip: Mage Hand. Spell: <b>Hold Monster</b>. Metamagic: Heightened.'],['12','Sorcerer 11','Spell: <b>Chain Lightning</b>. Swap Magic Missile for Globe of Invulnerability.']],
+ extra:['Party notes',['<b>You may not need the Cleric dip.</b> The guide only takes it for Create Water. The Druid and Cleric can make enemies Wet for you; if they do, stay Sorcerer to 12 for a third feat and CON save proficiency.','Ability boosts: Auntie Ethel\'s hair (+1 CHA), Mirror of Loss (+2 CHA), Birthright hat (+2 CHA).']]},
+D:{role:'Tank',line:'Circle of the Moon Druid 12',blurb:'Soaks hits in beast form, heals itself with spell slots and turns into an elemental late game.',
+ guide:['https://alcasthq.com/baldurs-gate-3-druid-build/','AlcastHQ: Best BG3 Moon Druid Build'],race:'Wood Elf',
+ create:[['Race','Wood Elf (speed, Perception, immune to magical sleep). Duergar, Gold Dwarf, Forest Gnome or Human also work.'],['Class','Druid: <b>Circle of the Moon</b> at level 2'],['Background','Acolyte, Folk Hero, or Guild Artisan (if you want to do some talking)'],['Skills','Perception, Insight, Medicine, Survival, Animal Handling'],['Cantrips','Thorn Whip, Shillelagh'],['First spell','Entangle']],
+ stats:{STR:10,DEX:14,CON:16,INT:8,WIS:16,CHA:10},hi:['CON','WIS'],statNote:"In Wild Shape your STR, DEX and CON are replaced by the beast's, but you keep your WIS, INT and CHA. That's why WIS comes first.",
+ play:['<b>Wild Shape is a second health bar.</b> When a beast form hits 0 HP you drop back to your own body with the HP you had before.','<b>Combat Wild Shape</b> turns you with a bonus action, so you can shift and attack in the same turn.','<b>Bear early:</b> high HP and a taunt that pulls enemies onto you and off the casters.','<b>Lunar Mend:</b> spend spell slots to heal yourself while transformed.','<b>Concentration matters.</b> High CON keeps Spike Growth, Haste and similar spells up when you get hit.','<b>Out of form:</b> Shillelagh early, dual scimitars later; Thorn Whip pulls casters off ledges.'],
+ levels:[['02','Moon subclass','Combat Wild Shape (bonus action), <b>Wild Shape: Bear</b>, Lunar Mend.'],['04','Dire Raven','Flying form that can Blind. Wild Shape damage goes up. First feat.'],['05','Wild Strike','Two attacks per action in Wild Shape. Third-level spells.'],['06','Primal Strike','Beast attacks count as magical, so physical resistance stops mattering.'],['08','Sabre-Toothed Tiger','Shreds armour and heals itself. Wild Shape damage up again. Second feat.'],['10','Myrmidon','Air, earth, fire or water elemental form. <b>Improved Wild Strike</b>: three attacks per action.'],['12','Capstone','Wild Shape damage up. Final feat.']],
+ levelHead:['Lvl','Unlock','What you get'],
+ extra:['Your jobs in this party',['<b>Frontline.</b> You are the only tank, so stand in front of the Sorcerer and Cleric.','<b>Make things Wet.</b> Create Water sets up the Sorcerer\'s double damage.','<b>Forms:</b> Bear early, Owlbear for area damage, Dire Raven to scout, Sabre-tooth from 8, Myrmidon late.','Feats and full spell list: see the linked guide.']]},
+A:{role:'Opener & scout',line:'Gloom Stalker Ranger 5 / Assassin Rogue 4 / Fighter 2 / War Cleric 1',blurb:'Opens from stealth with guaranteed crits and deletes a target before it can act.',
+ guide:['https://alcasthq.com/bg3-ranger-rogue-fighter-multiclass-build/','AlcastHQ: Gloomstalker Assassin Multiclass Build'],race:'Duergar',
+ create:[['Race','Duergar (invisible at will from level 5). Wood Elf, Githyanki, Lightfoot Halfling or Deep Gnome also work.'],['Class','Ranger first; Rogue, Fighter and Cleric come later'],['Background','Entertainer: Acrobatics, Performance'],['Skills','Stealth, Perception'],['Ranger picks','Favoured Enemy: <b>Bounty Hunter</b>. Natural Explorer: <b>Urban Tracker</b> (Wasteland Wanderer if someone else has Sleight of Hand)']],
+ stats:{STR:10,DEX:16,CON:14,INT:8,WIS:16,CHA:10},hi:['DEX','WIS'],statNote:'',
+ play:['<b>Win on turn one.</b> Start fights from stealth. Surprised enemies take guaranteed crits from Assassinate.','<b>Dread Ambusher</b> gives +initiative, extra movement and an extra attack on the first turn.','<b>Stack the opener:</b> Dread Ambusher, Action Surge and the War Cleric bonus attack can mean up to six attacks in one turn.','<b>Hide every turn.</b> Rogue and Gloom Stalker both let you Hide with a bonus action.','<b>Archery</b> fighting style for +2 to hit with bows.','Let someone else do the talking; your CHA is low.'],
+ levels:[['01','Ranger 1','Bounty Hunter, Urban Tracker.'],['02','Ranger 2','Fighting Style: <b>Archery</b>. Spells: <b>Hunter\'s Mark, Ensnaring Strike</b>.'],['03','Ranger 3','Subclass: <b>Gloom Stalker</b>. Dread Ambusher, bonus-action Hide, Superior Darkvision, Umbral Shroud.'],['04','Ranger 4','Feat (see guide).'],['05','Ranger 5','<b>Extra Attack</b>.'],['06','Rogue 1','Sneak Attack, Expertise.'],['07','Rogue 2','Cunning Action: bonus-action Hide, Dash, Disengage.'],['08','Rogue 3','Subclass: <b>Assassin</b>. Crits on Surprised targets.'],['09','Rogue 4','Feat (see guide).'],['10','Fighter 1','Second fighting style (Defence for AC).'],['11','Fighter 2','<b>Action Surge</b>.'],['12','Cleric 1','Subclass: <b>War Domain</b>. Extra attack three times per long rest.']],
+ extra:['Your jobs in this party',['<b>Scout and opener.</b> Go ahead, find the ambush spot and fire first. Everyone else waits out of sight.','<b>Perception</b> for traps and hidden enemies.','Feats: see the linked guide.']]},
+C:{role:'Healing, buffs, control',line:'Storm Sorcerer 1 / Light Domain Cleric 11',blurb:'Flies through the enemy line with Spirit Guardians up, debuffing everything it touches, and keeps the party alive.',
+ guide:['https://gamestegy.com/post/bg3/872/light-domain-cleric-build','Gamestegy: Light Domain Cleric Build'],race:'Wood Half-Elf',
+ create:[['Race','Wood Half-Elf or Wood Elf (speed helps Spirit Guardians). High Elf, High Half-Elf or Asmodeus Tiefling also work. Avoid small races.'],['Class','Cleric: <b>Light Domain</b>. Respec to Sorcerer 1 first at level 6.'],['Background','Acolyte, Folk Hero, Guild Artisan or Outlander'],['Skills','Animal Handling, Insight, Medicine, Perception, Survival'],['Cantrips','Sacred Flame, Produce Flame, Guidance'],['Prepared','Guiding Bolt, Command, Inflict Wounds, Sanctuary, Healing Word']],
+ stats:{STR:8,DEX:16,CON:15,INT:8,WIS:17,CHA:8},hi:['DEX','WIS'],statNote:'',
+ play:['<b>Spirit Guardians is the whole plan.</b> Run or fly through enemies; with the right gear each one you touch gets Radiating Orb and Reverberation and can be knocked prone.','<b>Tempestuous Magic</b> (from the Sorcerer dip) lets you fly as a bonus action after casting a spell, with no opportunity attacks.','<b>Heal with bonus actions.</b> Healing Word and Mass Healing Word; with The Whispering Promise ring they also Bless.','<b>Warding Flare</b> imposes disadvantage on an attack; from level 7 you can use it on allies.','<b>Fire too:</b> Fireball, Scorching Ray, Wall of Fire, Flame Strike.','<b>Guidance</b> before every skill check, for anyone.'],
+ levels:[['01','Cleric 1','<b>Light Domain</b>. Warding Flare, Light, Burning Hands, Faerie Fire.'],['02','Cleric 2','Radiance of the Dawn, Turn Undead.'],['03','Cleric 3','Cantrip: Thaumaturgy. Prepare Lesser Restoration, Enhance Ability, Hold Person, Spiritual Weapon.'],['04','Cleric 4','Feat: <b>+1 WIS, +1 CON</b> (or +2 WIS).'],['05','Cleric 5','Prepare <b>Spirit Guardians, Glyph of Warding, Mass Healing Word</b>. Fireball and Daylight are free.'],['06','Sorcerer 1','Respec: <b>Storm Sorcery</b> at level 1, then Cleric 1–5 again. CON save proficiency, Shield, Magic Missile.'],['07','Cleric 6','Improved Warding Flare (protect allies).'],['08','Cleric 7','Wall of Fire and Guardian of Faith (free).'],['09','Cleric 8','Potent Spellcasting. Feat: <b>+2 WIS</b> (or Alert).'],['10','Cleric 9','Flame Strike, Destructive Wave (free). Prepare Insect Plague.'],['11','Cleric 10','Divine Intervention (once per playthrough; save it for Honour Mode).'],['12','Cleric 11','Prepare <b>Heroes\' Feast</b>, Planar Ally.']],
+ extra:['Party notes',['Your guide also suggests Hood of the Weave and Cloak of the Weave; they are going to the Sorcerer, so keep the Holy Lance Helm and Thunderskin Cloak.','<b>Create Water</b> on a group sets up the Sorcerer\'s cold damage.']]}};
+
+const SPLIT=[['Boots of Stormy Clamour','C','Sorcerer wears Disintegrating Night Walkers instead.'],['Hood of the Weave','S','Cleric keeps the Holy Lance Helm; it feeds the Reverberation combo.'],['Cloak of the Weave','S','Cleric wears the Thunderskin Cloak.'],["Ketheric's Shield",'S',"Cleric uses the Sentinel Shield, then Viconia's Walking Fortress."],['Cloak of Displacement','A',"The Assassin's old Cloak of Protection goes to whoever has no cloak yet."],['Ring of Protection','D',"The tank gets the AC. Sorcerer takes Crusher's Ring."],['Bow of Awareness','C','Sorcerer gets initiative from the Alert feat instead.'],['Callous Glow Ring','C',"Core to the Cleric's radiant combo."],['Adamantine Forge','D','Two crafts: a Scimitar for the Druid and a Shield for the Cleric.'],['Mirror of Loss (+2 stat)','S','Both caster guides want it (CHA for the Sorcerer, WIS for the Cleric). Decide before you get there.']];
+
+/* ---------- state ---------- */
+const S={stops:[],items:[],players:{},db:null,status:'connecting',loaded:{stops:false,items:false},editMode:false,confirmDel:null,pass:null};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cvar=k=>`--c:var(${CH[k].v})`;
+const chip=k=>`<span class="chip" style="${cvar(k)}"><span class="dot"></span>${esc(CH[k].name)}</span>`;
+const stopById=id=>S.stops.find(s=>s.id===id);
+const sortedStops=()=>[...S.stops].sort((a,b)=>(a.act-b.act)||(a.order-b.order));
+const itemsFor=(pred)=>S.items.filter(pred).sort((a,b)=>{const sa=stopById(a.stopId),sb=stopById(b.stopId);const oa=sa?sa.act*1e6+sa.order:9e9,ob=sb?sb.act*1e6+sb.order:9e9;return (oa-ob)||((a.created||0)-(b.created||0));});
+const writable=()=>!!S.db&&S.status!=='offline';
+
+/* ---------- routing ---------- */
+function route(){const h=(location.hash||'').slice(1);return h||'party';}
+function go(r){if(location.hash.slice(1)!==r){location.hash=r;}else render();window.scrollTo(0,0);}
+addEventListener('hashchange',()=>{S.confirmDel=null;render();window.scrollTo(0,0);});
+
+function renderNav(){
+  const r=route();const base=r.split('-')[0];
+  const tabs=[['party','Party',null],['route','Gear route',null],...ORDER.map(k=>[CH[k].slug,CH[k].name,k])];
+  const st=S.status==='live'?'<span class="status live"><span class="pip"></span>Live · changes save for everyone</span>'
+    :S.status==='offline'?'<span class="status"><span class="pip"></span>Gear lists unavailable</span>'
+    :'<span class="status"><span class="pip"></span>Connecting…</span>';
+  document.getElementById('nav').innerHTML=tabs.map(([id,l,k])=>`<a class="tab" href="#${id}" ${base===id?'aria-current="page"':''} ${k?`style="${cvar(k)}"`:''}>${k?'<span class="dot"></span>':''}${esc(l)}</a>`).join('')+st;
+}
+
+/* ---------- pages ---------- */
+function accessNote(){
+  if(S.status==='offline')return `<div class="notice" data-kind="warn">The shared gear lists couldn't load. Check your connection and reload the page.</div>`;
+  return '';
+}
+function loadingOr(html){
+  if(S.status==='offline')return '';
+  if(!S.loaded.items||!S.loaded.stops)return `<div class="empty">Loading the party's gear list…</div>`;
+  return html;
+}
+
+function pageParty(){
+  const cards=ORDER.map(k=>{
+    const b=BUILD[k];const mine=S.items.filter(i=>i.who===k);const got=mine.filter(i=>i.got).length;const pct=mine.length?Math.round(got/mine.length*100):0;
+    const pname=S.players[k]||'';
+    return `<article class="pc" style="${cvar(k)}">
+      <div class="role">${esc(b.role)}</div>
+      <h3>${esc(CH[k].name)}</h3>
+      <div class="cls">${esc(b.line)}</div>
+      <div class="small">Suggested race: <b>${esc(b.race)}</b></div>
+      ${S.loaded.items?`<div class="meter" aria-hidden="true"><i style="width:${pct}%"></i></div><div class="count">${got} of ${mine.length} items collected</div>`:''}
+      <div class="player"><label for="pl-${k}">Player</label>
+        <input id="pl-${k}" data-player="${k}" value="${esc(pname)}" placeholder="Who's playing?" ${writable()?'':'disabled'} autocomplete="off"></div>
+      <div class="toolbar"><a class="tab" href="#${CH[k].slug}">Gear</a><a class="tab" href="#${CH[k].slug}-build">Build</a></div>
+    </article>`;}).join('');
+  const split=SPLIT.map(([it,k,t])=>`<tr><td>${esc(it)}</td><td>${chip(k)}</td><td>${esc(t)}</td></tr>`).join('');
+  return `<section class="page">
+    <div class="head"><div class="eyebrow">Baldur's Gate 3 · Honour Mode · 4-player co-op</div><h1>The Party</h1>
+      <p class="muted">Four builds, the guides they come from, and who gets which gear. Each character's gear list is shared: tick items off as you get them, or add, edit and remove items, and everyone sees it.</p></div>
+    ${accessNote()}
+    <div class="cards">${cards}</div>
+    <h2>Who gets the contested gear</h2>
+    <div class="tblwrap"><table class="tbl plain"><thead><tr><th>Wanted by two of you</th><th>Goes to</th><th>The other one takes</th></tr></thead><tbody>${split}</tbody></table></div>
+    <div class="grid2">
+      <div class="box"><div class="eyebrow">Points of no return</div><ul class="list">
+        <li><b>Leaving Act 1</b> (Mountain Pass or Underdark exit) locks off the Grove, Underdark, Grymforge, Rosymorn and the Crèche. Clear the Act 1 list first.</li>
+        <li><b>Entering the Mind Flayer Colony</b> ends Act 2. Get Moonrise Towers and Gauntlet of Shar loot before then.</li>
+        <li><b>Don't attack the Grove</b> if you want Dammon's Act 2 stock.</li>
+        <li><b>Potent Robe</b> isn't available to a Dark Urge character.</li></ul></div>
+      <div class="box"><div class="eyebrow">How the party fits together</div><ul class="list">
+        <li><b>Wet, then freeze.</b> The Druid and Cleric cast Create Water so the Sorcerer's cold damage doubles.</li>
+        <li><b>Assassin opens;</b> everyone else waits out of sight until the first shot.</li>
+        <li><b>Druid holds the front</b> in Bear form; the Cleric runs Spirit Guardians through the enemy line behind.</li>
+        <li><b>Sorcerer does the talking</b> (highest Charisma); the Cleric and Druid cover Wisdom checks.</li>
+        <li><b>Honour Mode:</b> one save, no reloads. Long rest before big fights, carry 2 Scrolls of Revivify each, and respec with Withers (100 gold) if a build isn't working.</li></ul></div>
+    </div></section>`;
+}
+
+function itemRow(it,{showWho,showWhere}){
+  const st=stopById(it.stopId);const w=writable();
+  const del=S.confirmDel===it.id;
+  return `<div class="item ${it.got?'got':''}" style="${cvar(it.who)}">
+    <div class="check"><input type="checkbox" id="got-${esc(it.id)}" data-got="${esc(it.id)}" ${it.got?'checked':''} ${w?'':'disabled'} aria-label="Got ${esc(it.name)}"></div>
+    <div class="main">
+      <div class="line1"><label class="name" for="got-${esc(it.id)}">${esc(it.name)}</label><span class="slot">${esc(it.slot)}</span>${it.optional?'<span class="opt">optional</span>':''}${showWho?chip(it.who):''}</div>
+      ${showWhere&&st?`<div class="where">${esc(st.name)}</div>`:''}
+      ${it.how?`<div class="how">${esc(it.how)}</div>`:''}
+    </div>
+    ${w?`<div class="acts">${del?`<span class="confirm">Remove it? <button class="ibtn danger" data-delyes="${esc(it.id)}">Remove</button><button class="ibtn" data-delno>Keep</button></span>`:`<button class="ibtn" data-edit="${esc(it.id)}">Edit</button><button class="ibtn" data-del="${esc(it.id)}" aria-label="Remove ${esc(it.name)}">Remove</button>`}</div>`:''}
+  </div>`;
+}
+
+function pageGear(k){
+  const b=BUILD[k];const mine=itemsFor(i=>i.who===k);const got=mine.filter(i=>i.got).length;
+  let body='';
+  for(const a of [1,2,3]){
+    const list=mine.filter(i=>(stopById(i.stopId)?.act||3)===a);
+    if(!list.length)continue;
+    body+=`<div class="act"><div class="act-h"><h2>Act ${a}</h2></div><div class="stop">${list.map(it=>itemRow(it,{showWho:false,showWhere:true})).join('')}</div></div>`;
+  }
+  if(!body)body=`<div class="empty">No gear on ${esc(CH[k].name)}'s list yet. ${writable()?'Use <b>Add item</b> to add the first one.':''}</div>`;
+  return `<section class="page" style="${cvar(k)}">
+    <div class="head"><div class="eyebrow">${esc(CH[k].name)}${S.players[k]?' · '+esc(S.players[k]):''}</div><h1>Gear checklist</h1>
+      <p class="muted">In the order you'll reach it. Tick items off as you get them. ${S.loaded.items?`<b>${got} of ${mine.length}</b> collected.`:''}</p></div>
+    ${subtabs(k,'gear')}
+    ${accessNote()}
+    ${writable()?`<div class="toolbar"><button class="btn" data-add="${k}">Add item</button></div>`:''}
+    ${loadingOr(body)}
+  </section>`;
+}
+
+function subtabs(k,cur){return `<div class="subtabs"><a class="tab" href="#${CH[k].slug}" ${cur==='gear'?'aria-current="page"':''}>Gear checklist</a><a class="tab" href="#${CH[k].slug}-build" ${cur==='build'?'aria-current="page"':''}>Build &amp; levels</a></div>`;}
+
+function pageBuild(k){
+  const b=BUILD[k];
+  const kv=b.create.map(([a,v])=>`<div><span class="k">${esc(a)}</span><span class="v">${v}</span></div>`).join('');
+  const stats=Object.entries(b.stats).map(([n,v])=>`<div class="stat ${b.hi.includes(n)?'hi':''}"><span>${n}</span><strong>${v}</strong></div>`).join('');
+  const head=b.levelHead||['Lvl','Take','What to pick / what you get'];
+  const lv=b.levels.map(r=>`<tr><td>${r[0]}</td><td>${esc(r[1])}</td><td>${r[2]}</td></tr>`).join('');
+  return `<section class="page" style="${cvar(k)}">
+    <div class="head"><div class="eyebrow">${esc(b.role)}</div><h1>${esc(CH[k].name)}</h1>
+      <p><b>${esc(b.line)}</b></p><p class="muted">${esc(b.blurb)}</p>
+      <p class="small">Guide: <a href="${b.guide[0]}" target="_blank" rel="noopener">${esc(b.guide[1])}</a></p></div>
+    ${subtabs(k,'build')}
+    <div class="grid2">
+      <div class="box"><div class="eyebrow">Character creator</div><div class="kv">${kv}</div><div class="stats">${stats}</div>${b.statNote?`<p class="small muted">${esc(b.statNote)}</p>`:''}</div>
+      <div class="box"><div class="eyebrow">How to play it</div><ul class="list">${b.play.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    </div>
+    <h2>${k==='D'?'Milestones, 1 to 12':'Level-up plan, 1 to 12'}</h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>${head[0]}</th><th>${head[1]}</th><th>${head[2]}</th></tr></thead><tbody>${lv}</tbody></table></div>
+    <div class="box"><div class="eyebrow">${esc(b.extra[0])}</div><ul class="list">${b.extra[1].map(x=>`<li>${x}</li>`).join('')}</ul></div>
+  </section>`;
+}
+
+function pageRoute(){
+  const w=writable();
+  let body='';
+  for(const a of [1,2,3]){
+    const stops=sortedStops().filter(s=>s.act===a);
+    let html='';
+    stops.forEach((s,idx)=>{
+      const its=itemsFor(i=>i.stopId===s.id);
+      if(!its.length&&!S.editMode)return;
+      const tools=S.editMode&&w?`<div class="tools"><button class="ibtn" data-up="${esc(s.id)}" ${idx===0?'disabled':''} aria-label="Move ${esc(s.name)} up">▲</button><button class="ibtn" data-down="${esc(s.id)}" ${idx===stops.length-1?'disabled':''} aria-label="Move ${esc(s.name)} down">▼</button><button class="ibtn" data-rename="${esc(s.id)}">Rename</button></div>`:'';
+      html+=`<div class="stop"><div class="stop-h"><h3>${esc(s.name)}</h3>${s.detail?`<span class="detail">${esc(s.detail)}</span>`:''}${tools}</div>
+        ${its.length?its.map(it=>itemRow(it,{showWho:true,showWhere:false})).join(''):`<div class="item"><div></div><div class="muted small">No items here yet.</div></div>`}</div>`;
+    });
+    if(!html)html=`<div class="empty">Nothing on anyone's list in Act ${a} yet.</div>`;
+    body+=`<div class="act"><div class="act-h"><h2>Act ${a}</h2><p>${ACTNOTE[a]}</p></div>${html}</div>`;
+  }
+  return `<section class="page">
+    <div class="head"><div class="eyebrow">Whole party</div><h1>Gear route</h1>
+      <p class="muted">Every item on everyone's list, grouped by where you get it, in route order. Add an item on your own gear page and it shows up here under its location.</p></div>
+    ${accessNote()}
+    ${w?`<div class="toolbar"><button class="btn ghost" data-editmode>${S.editMode?'Done arranging':'Arrange locations'}</button>${S.editMode?'<span class="small muted">Move locations up or down to match the order you play them. Empty locations show while arranging.</span>':''}</div>`:''}
+    ${loadingOr(body)}
+  </section>`;
+}
+
+function render(){
+  renderNav();
+  const r=route();const app=document.getElementById('app');
+  let html;
+  if(r==='party')html=pageParty();
+  else if(r==='route')html=pageRoute();
+  else{
+    const k=ORDER.find(k=>r===CH[k].slug||r===CH[k].slug+'-build');
+    if(!k)html=pageParty();
+    else html=r.endsWith('-build')?pageBuild(k):pageGear(k);
+  }
+  // keep focus on a player name input while others update
+  const ae=document.activeElement;const keep=ae&&ae.dataset&&ae.dataset.player?ae.dataset.player:null;
+  const sel=keep?[ae.selectionStart,ae.selectionEnd,ae.value]:null;
+  app.innerHTML=html;
+  if(keep){const el=app.querySelector(`[data-player="${keep}"]`);if(el){el.value=sel[2];el.focus();try{el.setSelectionRange(sel[0],sel[1]);}catch(e){}}}
+}
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg){const h=document.getElementById('toastHost');h.innerHTML=`<div class="toast">${esc(msg)}</div>`;clearTimeout(toastT);toastT=setTimeout(()=>h.innerHTML='',2600);}
+function fail(e){
+  if(e&&e.cancelled)return;
+  if(e&&e.code==='28P01'){toast("That passcode didn't work. Try again.");return;}
+  if(e&&e.code==='PGRST202'){toast("That change isn't switched on in the database yet.");return;}
+  toast("Couldn't save that. Check your connection and try again.");
+}
+
+/* ---------- passcode ---------- */
+function loadPass(){try{return localStorage.getItem(PASS_KEY);}catch(e){return null;}}
+function savePass(p){S.pass=p;try{p?localStorage.setItem(PASS_KEY,p):localStorage.removeItem(PASS_KEY);}catch(e){}}
+// Resolves to the passcode, asking for it (and checking it) the first time on this device. Rejects if cancelled.
+function needPass(){
+  if(S.pass)return Promise.resolve(S.pass);
+  return new Promise((resolve,reject)=>{
+    const host=document.getElementById('sheetHost');
+    host.innerHTML=`<div class="scrim" id="scrim"><form class="sheet" id="pcForm" role="dialog" aria-modal="true" aria-labelledby="pcT" novalidate>
+      <h2 id="pcT">Party passcode</h2>
+      <p class="muted">Anyone can view the lists. To change them, enter the passcode your party shares. This device remembers it.</p>
+      <div class="field"><label for="pc-code">Passcode</label><input id="pc-code" type="password" autocomplete="current-password" required></div>
+      <div class="err" id="pc-err" hidden></div>
+      <div class="toolbar"><button class="btn" type="submit" id="pc-ok">Unlock editing</button><button class="btn ghost" type="button" id="pc-cancel">Cancel</button></div></form></div>`;
+    const $=id=>document.getElementById(id);
+    const cancel=()=>{host.innerHTML='';reject({cancelled:true});};
+    $('pc-cancel').onclick=cancel;
+    $('scrim').addEventListener('click',e=>{if(e.target.id==='scrim')cancel();});
+    $('pcForm').addEventListener('keydown',e=>{if(e.key==='Escape')cancel();});
+    $('pc-code').focus();
+    $('pcForm').onsubmit=async ev=>{
+      ev.preventDefault();const p=$('pc-code').value.trim();const err=$('pc-err');err.hidden=true;
+      if(!p){err.textContent='Enter the passcode.';err.hidden=false;return;}
+      $('pc-ok').disabled=true;
+      const {error}=await S.db.rpc('check_passcode',{p_passcode:p});
+      $('pc-ok').disabled=false;
+      if(error){err.textContent=error.code==='28P01'?"That passcode didn't work.":"Couldn't check the passcode. Check your connection.";err.hidden=false;return;}
+      savePass(p);host.innerHTML='';toast('Editing unlocked on this device');resolve(p);
+    };
+  });
+}
+// Calls a passcode-checked database function, then refreshes the table it changed.
+async function write(fn,args,table){
+  const p=await needPass();
+  const {data,error}=await S.db.rpc(fn,{p_passcode:p,...args});
+  if(error){if(error.code==='28P01')savePass(null);throw error;}
+  if(table)loadTable(table);
+  return data;
+}
+
+/* ---------- add / edit sheet ---------- */
+function stopOptions(sel){
+  let o='';
+  for(const a of [1,2,3]){o+=`<optgroup label="Act ${a}">`+sortedStops().filter(s=>s.act===a).map(s=>`<option value="${esc(s.id)}" ${s.id===sel?'selected':''}>${esc(s.name)}</option>`).join('')+'</optgroup>';}
+  return o+`<option value="__new">New location…</option>`;
+}
+function openSheet({item,who}){
+  const it=item||{who,name:'',slot:'Head',stopId:sortedStops()[0]?.id||'__new',how:'',optional:false};
+  const names=[...new Set(S.items.map(i=>i.name))].sort();
+  const host=document.getElementById('sheetHost');
+  host.innerHTML=`<div class="scrim" id="scrim"><form class="sheet" id="itemForm" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" novalidate>
+    <h2 id="sheetTitle">${item?'Edit item':'Add item'}</h2>
+    <div class="field"><label for="f-name">Item name</label><input id="f-name" list="f-names" required value="${esc(it.name)}" autocomplete="off"><datalist id="f-names">${names.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+      <span class="hint">Pick an item already in the guide to copy its slot and location, or type a new one.</span></div>
+    <div class="row2">
+      <div class="field"><label for="f-who">For</label><select id="f-who">${ORDER.map(k=>`<option value="${k}" ${k===it.who?'selected':''}>${esc(CH[k].name)}</option>`).join('')}</select></div>
+      <div class="field"><label for="f-slot">Slot</label><select id="f-slot">${SLOTS.map(s=>`<option ${s===it.slot?'selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="field"><label for="f-stop">Where you get it</label><select id="f-stop">${stopOptions(it.stopId)}</select></div>
+    <div class="row2" id="newStop" hidden>
+      <div class="field"><label for="f-stopname">New location name</label><input id="f-stopname" autocomplete="off"></div>
+      <div class="field"><label for="f-stopact">Act</label><select id="f-stopact"><option value="1">Act 1</option><option value="2">Act 2</option><option value="3">Act 3</option></select></div>
+    </div>
+    <div class="field"><label for="f-how">How to get it <span class="muted">(optional)</span></label><textarea id="f-how" placeholder="e.g. Buy from Grat, or loot from the chest by the door">${esc(it.how)}</textarea></div>
+    <label class="inline"><input type="checkbox" id="f-opt" ${it.optional?'checked':''}> Nice to have, not essential</label>
+    <div class="err" id="f-err" hidden></div>
+    <div class="toolbar"><button class="btn" type="submit" id="f-save">${item?'Save changes':'Add to list'}</button><button class="btn ghost" type="button" id="f-cancel">Cancel</button></div>
+  </form></div>`;
+  const $=id=>document.getElementById(id);
+  const syncNew=()=>{$('newStop').hidden=$('f-stop').value!=='__new';};
+  syncNew();$('f-stop').addEventListener('change',syncNew);
+  $('f-name').addEventListener('change',()=>{
+    if(item)return;const m=S.items.find(i=>i.name.toLowerCase()===$('f-name').value.trim().toLowerCase());
+    if(m){$('f-slot').value=m.slot;$('f-stop').value=m.stopId;if(!$('f-how').value)$('f-how').value=m.how||'';syncNew();}
+  });
+  const close=()=>{host.innerHTML='';};
+  $('f-cancel').addEventListener('click',close);
+  $('scrim').addEventListener('click',e=>{if(e.target.id==='scrim')close();});
+  host.addEventListener('keydown',e=>{if(e.key==='Escape')close();},{once:true});
+  $('f-name').focus();
+  $('itemForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const name=$('f-name').value.trim();const err=$('f-err');err.hidden=true;
+    if(!name){err.textContent='Give the item a name.';err.hidden=false;return;}
+    let stopId=$('f-stop').value;
+    $('f-save').disabled=true;
+    try{
+      if(stopId==='__new'){
+        const sn=$('f-stopname').value.trim();const act=+$('f-stopact').value;
+        if(!sn){err.textContent='Name the new location, or pick one from the list.';err.hidden=false;$('f-save').disabled=false;return;}
+        stopId=await write('add_stop',{p_name:sn,p_act:act},'stops');
+      }
+      const data={who:$('f-who').value,name,slot:$('f-slot').value,stopId,how:$('f-how').value.trim(),optional:$('f-opt').checked};
+      await write('save_item',{p_id:item?item.id:null,p_who:data.who,p_name:data.name,p_slot:data.slot,p_stop_id:data.stopId,p_how:data.how,p_optional:data.optional},'items');
+      toast(item?'Saved':`Added to ${CH[data.who].name}'s list`);
+      close();
+    }catch(ex){$('f-save').disabled=false;fail(ex);}
+  });
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('button');if(!t)return;
+  const d=t.dataset;
+  if(d.add){try{await needPass();}catch(ex){return;}openSheet({who:d.add});return;}
+  if(d.edit){const it=S.items.find(i=>i.id===d.edit);if(!it)return;try{await needPass();}catch(ex){return;}openSheet({item:it});return;}
+  if(d.del){S.confirmDel=d.del;render();return;}
+  if('delno' in d){S.confirmDel=null;render();return;}
+  if(d.delyes){S.confirmDel=null;render();try{await write('remove_item',{p_id:d.delyes},'items');toast('Removed');}catch(ex){fail(ex);}return;}
+  if('editmode' in d){if(!S.editMode){try{await needPass();}catch(ex){return;}}S.editMode=!S.editMode;render();return;}
+  if(d.up||d.down){
+    const id=d.up||d.down;const s=stopById(id);const list=sortedStops().filter(x=>x.act===s.act);const i=list.findIndex(x=>x.id===id);
+    let order;
+    if(d.up){const p=list[i-1],pp=list[i-2];if(!p)return;order=pp?(pp.order+p.order)/2:p.order-10;}
+    else{const n=list[i+1],nn=list[i+2];if(!n)return;order=nn?(n.order+nn.order)/2:n.order+10;}
+    t.disabled=true;
+    try{await write('move_stop',{p_id:id,p_sort_order:order},'stops');}catch(ex){t.disabled=false;fail(ex);}
+    return;
+  }
+  if(d.rename){
+    const s=stopById(d.rename);const host=document.getElementById('sheetHost');
+    host.innerHTML=`<div class="scrim" id="scrim"><form class="sheet" id="rnForm" role="dialog" aria-modal="true" aria-labelledby="rnT"><h2 id="rnT">Rename location</h2>
+      <div class="field"><label for="r-name">Name</label><input id="r-name" value="${esc(s.name)}" autocomplete="off"></div>
+      <div class="field"><label for="r-detail">Area <span class="muted">(optional)</span></label><input id="r-detail" value="${esc(s.detail)}" autocomplete="off"></div>
+      <div class="toolbar"><button class="btn" type="submit">Save</button><button class="btn ghost" type="button" id="r-cancel">Cancel</button></div></form></div>`;
+    const close=()=>host.innerHTML='';
+    document.getElementById('r-cancel').onclick=close;
+    document.getElementById('rnForm').onsubmit=async ev=>{ev.preventDefault();const n=document.getElementById('r-name').value.trim();if(!n)return;
+      try{await write('update_stop',{p_id:s.id,p_name:n,p_detail:document.getElementById('r-detail').value.trim()},'stops');close();toast('Saved');}catch(ex){fail(ex);}};
+    document.getElementById('r-name').focus();
+  }
+});
+document.addEventListener('change',async e=>{
+  const t=e.target;
+  if(t.dataset&&t.dataset.got){const id=t.dataset.got;const got=t.checked;
+    const it=S.items.find(i=>i.id===id);if(it){it.got=got;render();}
+    try{await write('set_item_got',{p_id:id,p_got:got},'items');}catch(ex){if(it){it.got=!got;render();}fail(ex);}}
+});
+let plT={};
+document.addEventListener('input',e=>{
+  const t=e.target;if(!t.dataset||!t.dataset.player)return;const k=t.dataset.player;
+  clearTimeout(plT[k]);plT[k]=setTimeout(async()=>{
+    const v=t.value.trim();
+    try{await write('set_player',{p_who:k,p_name:v},'players');S.players[k]=v;}catch(ex){fail(ex);}
+  },700);
+});
+
+/* ---------- boot ---------- */
+render();
+S.pass=loadPass();
+const MAP={
+  stops:r=>({id:r.id,name:r.name,detail:r.detail||'',act:r.act,order:r.sort_order}),
+  items:r=>({id:r.id,who:String(r.who).trim(),name:r.name,slot:r.slot,stopId:r.stop_id,how:r.how||'',optional:r.optional,got:r.got,created:r.created})};
+async function loadTable(t){
+  const {data,error}=await S.db.from(t).select('*');
+  if(error){if(!S.loaded.items||!S.loaded.stops){S.status='offline';render();}return;}
+  if(t==='players'){S.players={};for(const r of data)S.players[String(r.who).trim()]=r.name||'';}
+  else{S[t]=data.map(MAP[t]);S.loaded[t]=true;}
+  if(S.status!=='live'&&S.loaded.items&&S.loaded.stops)S.status='live';
+  render();
+}
+const loadAll=()=>Promise.all(['stops','items','players'].map(loadTable));
+(async()=>{
+  if(!window.supabase){S.status='offline';render();return;}
+  S.db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false}});
+  await loadAll();
+  // Live updates: when anyone changes a table, reload it.
+  const pending={};
+  const reload=t=>{clearTimeout(pending[t]);pending[t]=setTimeout(()=>loadTable(t),150);};
+  let ch=S.db.channel('party');
+  for(const t of ['stops','items','players'])ch=ch.on('postgres_changes',{event:'*',schema:'public',table:t},()=>reload(t));
+  ch.subscribe();
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadAll();});
+})();
+</script>
+
+</body>
+</html>
