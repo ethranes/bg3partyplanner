@@ -51,6 +51,15 @@ p{margin:0;max-width:68ch}
 .status .pip{width:8px;height:8px;border-radius:50%;background:var(--muted)}
 .status.live .pip{background:var(--druid)}
 @media (max-width:640px){.status{margin-left:0;width:100%}}
+/* view / edit mode strip, part of the sticky bar so it is always visible */
+.modebar{border-top:1px solid var(--line);background:var(--sunk)}
+.modebar[data-mode="edit"]{background:var(--accent);color:var(--accent-ink);border-top-color:var(--accent)}
+.modebar-in{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:8px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.modebar .mode{display:flex;align-items:center;gap:8px;font-size:15px}
+.modebar .mode b{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.modebar .mode svg{width:18px;height:18px;flex-shrink:0}
+.modebar .btn{min-height:40px}
+.modebar[data-mode="edit"] .btn{background:var(--accent-ink);color:var(--accent);border-color:var(--accent-ink)}
 
 .page{display:flex;flex-direction:column;gap:28px;padding-top:28px}
 .head{display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:2px solid var(--ink)}
@@ -152,7 +161,7 @@ ul.list b,.kv b,.tbl b{color:var(--ink)}
 </style>
 </head>
 <body>
-<header class="bar"><nav class="bar-in" id="nav" aria-label="Pages"></nav></header>
+<header class="bar"><nav class="bar-in" id="nav" aria-label="Pages"></nav><div class="modebar" id="modebar" hidden></div></header>
 <main class="wrap" id="app"></main>
 <div id="sheetHost"></div>
 <div id="toastHost" aria-live="polite"></div>
@@ -165,6 +174,7 @@ ul.list b,.kv b,.tbl b{color:var(--ink)}
 const SUPABASE_URL='https://blfgzzmmnbeswlmcleqa.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsZmd6em1tbmJlc3dsbWNsZXFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NDU3NDMsImV4cCI6MjEwNzIyMTc0M30.jPa2kQSMP65C_d6xj0-qbUcF3LqJIBlCh_hnlHChwh8';
 const PASS_KEY='bg3-party-passcode';
+const EDIT_KEY='bg3-party-editing';
 
 const CH={
  S:{key:'S',slug:'sorcerer',name:'Cold Sorcerer',v:'--sorc'},
@@ -209,14 +219,14 @@ C:{role:'Healing, buffs, control',line:'Storm Sorcerer 1 / Light Domain Cleric 1
 const SPLIT=[['Boots of Stormy Clamour','C','Sorcerer wears Disintegrating Night Walkers instead.'],['Hood of the Weave','S','Cleric keeps the Holy Lance Helm; it feeds the Reverberation combo.'],['Cloak of the Weave','S','Cleric wears the Thunderskin Cloak.'],["Ketheric's Shield",'S',"Cleric uses the Sentinel Shield, then Viconia's Walking Fortress."],['Cloak of Displacement','A',"The Assassin's old Cloak of Protection goes to whoever has no cloak yet."],['Ring of Protection','D',"The tank gets the AC. Sorcerer takes Crusher's Ring."],['Bow of Awareness','C','Sorcerer gets initiative from the Alert feat instead.'],['Callous Glow Ring','C',"Core to the Cleric's radiant combo."],['Adamantine Forge','D','Two crafts: a Scimitar for the Druid and a Shield for the Cleric.'],['Mirror of Loss (+2 stat)','S','Both caster guides want it (CHA for the Sorcerer, WIS for the Cleric). Decide before you get there.']];
 
 /* ---------- state ---------- */
-const S={stops:[],items:[],players:{},db:null,status:'connecting',loaded:{stops:false,items:false},editMode:false,confirmDel:null,pass:null};
+const S={stops:[],items:[],players:{},db:null,status:'connecting',loaded:{stops:false,items:false},editing:false,arrange:false,confirmDel:null,pass:null};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cvar=k=>`--c:var(${CH[k].v})`;
 const chip=k=>`<span class="chip" style="${cvar(k)}"><span class="dot"></span>${esc(CH[k].name)}</span>`;
 const stopById=id=>S.stops.find(s=>s.id===id);
 const sortedStops=()=>[...S.stops].sort((a,b)=>(a.act-b.act)||(a.order-b.order));
 const itemsFor=(pred)=>S.items.filter(pred).sort((a,b)=>{const sa=stopById(a.stopId),sb=stopById(b.stopId);const oa=sa?sa.act*1e6+sa.order:9e9,ob=sb?sb.act*1e6+sb.order:9e9;return (oa-ob)||((a.created||0)-(b.created||0));});
-const writable=()=>!!S.db&&S.status!=='offline';
+const writable=()=>S.editing&&!!S.db&&S.status!=='offline';
 
 /* ---------- routing ---------- */
 function route(){const h=(location.hash||'').slice(1);return h||'party';}
@@ -226,10 +236,22 @@ addEventListener('hashchange',()=>{S.confirmDel=null;render();window.scrollTo(0,
 function renderNav(){
   const r=route();const base=r.split('-')[0];
   const tabs=[['party','Party',null],['route','Gear route',null],...ORDER.map(k=>[CH[k].slug,CH[k].name,k])];
-  const st=S.status==='live'?'<span class="status live"><span class="pip"></span>Live · changes save for everyone</span>'
+  const st=S.status==='live'?'<span class="status live"><span class="pip"></span>Live</span>'
     :S.status==='offline'?'<span class="status"><span class="pip"></span>Gear lists unavailable</span>'
     :'<span class="status"><span class="pip"></span>Connecting…</span>';
+  renderModebar();
   document.getElementById('nav').innerHTML=tabs.map(([id,l,k])=>`<a class="tab" href="#${id}" ${base===id?'aria-current="page"':''} ${k?`style="${cvar(k)}"`:''}>${k?'<span class="dot"></span>':''}${esc(l)}</a>`).join('')+st;
+}
+
+const ICON_EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICON_PEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>';
+function renderModebar(){
+  const el=document.getElementById('modebar');
+  if(!S.db||S.status!=='live'){el.hidden=true;return;}
+  el.hidden=false;el.dataset.mode=S.editing?'edit':'view';
+  el.innerHTML=S.editing
+    ?`<div class="modebar-in"><span class="mode">${ICON_PEN}<span><b>Edit mode</b> · Changes save for everyone.</span></span><button class="btn" data-mode="view">Done editing</button></div>`
+    :`<div class="modebar-in"><span class="mode">${ICON_EYE}<span><b>View only</b> · Ticking and editing are locked.</span></span><button class="btn" data-mode="edit">Edit mode</button></div>`;
 }
 
 /* ---------- pages ---------- */
@@ -344,8 +366,8 @@ function pageRoute(){
     let html='';
     stops.forEach((s,idx)=>{
       const its=itemsFor(i=>i.stopId===s.id);
-      if(!its.length&&!S.editMode)return;
-      const tools=S.editMode&&w?`<div class="tools"><button class="ibtn" data-up="${esc(s.id)}" ${idx===0?'disabled':''} aria-label="Move ${esc(s.name)} up">▲</button><button class="ibtn" data-down="${esc(s.id)}" ${idx===stops.length-1?'disabled':''} aria-label="Move ${esc(s.name)} down">▼</button><button class="ibtn" data-rename="${esc(s.id)}">Rename</button></div>`:'';
+      if(!its.length&&!S.arrange)return;
+      const tools=S.arrange&&w?`<div class="tools"><button class="ibtn" data-up="${esc(s.id)}" ${idx===0?'disabled':''} aria-label="Move ${esc(s.name)} up">▲</button><button class="ibtn" data-down="${esc(s.id)}" ${idx===stops.length-1?'disabled':''} aria-label="Move ${esc(s.name)} down">▼</button><button class="ibtn" data-rename="${esc(s.id)}">Rename</button></div>`:'';
       html+=`<div class="stop"><div class="stop-h"><h3>${esc(s.name)}</h3>${s.detail?`<span class="detail">${esc(s.detail)}</span>`:''}${tools}</div>
         ${its.length?its.map(it=>itemRow(it,{showWho:true,showWhere:false})).join(''):`<div class="item"><div></div><div class="muted small">No items here yet.</div></div>`}</div>`;
     });
@@ -356,7 +378,7 @@ function pageRoute(){
     <div class="head"><div class="eyebrow">Whole party</div><h1>Gear route</h1>
       <p class="muted">Every item on everyone's list, grouped by where you get it, in route order. Add an item on your own gear page and it shows up here under its location.</p></div>
     ${accessNote()}
-    ${w?`<div class="toolbar"><button class="btn ghost" data-editmode>${S.editMode?'Done arranging':'Arrange locations'}</button>${S.editMode?'<span class="small muted">Move locations up or down to match the order you play them. Empty locations show while arranging.</span>':''}</div>`:''}
+    ${w?`<div class="toolbar"><button class="btn ghost" data-editmode>${S.arrange?'Done arranging':'Arrange locations'}</button>${S.arrange?'<span class="small muted">Move locations up or down to match the order you play them. Empty locations show while arranging.</span>':''}</div>`:''}
     ${loadingOr(body)}
   </section>`;
 }
@@ -384,7 +406,7 @@ let toastT;
 function toast(msg){const h=document.getElementById('toastHost');h.innerHTML=`<div class="toast">${esc(msg)}</div>`;clearTimeout(toastT);toastT=setTimeout(()=>h.innerHTML='',2600);}
 function fail(e){
   if(e&&e.cancelled)return;
-  if(e&&e.code==='28P01'){toast("That passcode didn't work. Try again.");return;}
+  if(e&&e.code==='28P01'){toast("The passcode has changed. Press Edit mode and enter the new one.");return;}
   if(e&&e.code==='PGRST202'){toast("That change isn't switched on in the database yet.");return;}
   toast("Couldn't save that. Check your connection and try again.");
 }
@@ -392,6 +414,11 @@ function fail(e){
 /* ---------- passcode ---------- */
 function loadPass(){try{return localStorage.getItem(PASS_KEY);}catch(e){return null;}}
 function savePass(p){S.pass=p;try{p?localStorage.setItem(PASS_KEY,p):localStorage.removeItem(PASS_KEY);}catch(e){}}
+function setEditing(on){
+  S.editing=on;S.confirmDel=null;if(!on)S.arrange=false;
+  try{localStorage.setItem(EDIT_KEY,on?'1':'0');}catch(e){}
+  render();
+}
 // Resolves to the passcode, asking for it (and checking it) the first time on this device. Rejects if cancelled.
 function needPass(){
   if(S.pass)return Promise.resolve(S.pass);
@@ -416,7 +443,7 @@ function needPass(){
       const {error}=await S.db.rpc('check_passcode',{p_passcode:p});
       $('pc-ok').disabled=false;
       if(error){err.textContent=error.code==='28P01'?"That passcode didn't work.":"Couldn't check the passcode. Check your connection.";err.hidden=false;return;}
-      savePass(p);host.innerHTML='';toast('Editing unlocked on this device');resolve(p);
+      savePass(p);host.innerHTML='';resolve(p);
     };
   });
 }
@@ -424,7 +451,7 @@ function needPass(){
 async function write(fn,args,table){
   const p=await needPass();
   const {data,error}=await S.db.rpc(fn,{p_passcode:p,...args});
-  if(error){if(error.code==='28P01')savePass(null);throw error;}
+  if(error){if(error.code==='28P01'){savePass(null);setEditing(false);}throw error;}
   if(table)loadTable(table);
   return data;
 }
@@ -493,12 +520,14 @@ function openSheet({item,who}){
 document.addEventListener('click',async e=>{
   const t=e.target.closest('button');if(!t)return;
   const d=t.dataset;
-  if(d.add){try{await needPass();}catch(ex){return;}openSheet({who:d.add});return;}
-  if(d.edit){const it=S.items.find(i=>i.id===d.edit);if(!it)return;try{await needPass();}catch(ex){return;}openSheet({item:it});return;}
+  if(d.mode==='edit'){try{await needPass();}catch(ex){return;}setEditing(true);toast('Edit mode on');return;}
+  if(d.mode==='view'){setEditing(false);toast('Back to view only');return;}
+  if(d.add){openSheet({who:d.add});return;}
+  if(d.edit){const it=S.items.find(i=>i.id===d.edit);if(it)openSheet({item:it});return;}
   if(d.del){S.confirmDel=d.del;render();return;}
   if('delno' in d){S.confirmDel=null;render();return;}
   if(d.delyes){S.confirmDel=null;render();try{await write('remove_item',{p_id:d.delyes},'items');toast('Removed');}catch(ex){fail(ex);}return;}
-  if('editmode' in d){if(!S.editMode){try{await needPass();}catch(ex){return;}}S.editMode=!S.editMode;render();return;}
+  if('editmode' in d){S.arrange=!S.arrange;render();return;}
   if(d.up||d.down){
     const id=d.up||d.down;const s=stopById(id);const list=sortedStops().filter(x=>x.act===s.act);const i=list.findIndex(x=>x.id===id);
     let order;
@@ -539,6 +568,7 @@ document.addEventListener('input',e=>{
 /* ---------- boot ---------- */
 render();
 S.pass=loadPass();
+try{S.editing=!!S.pass&&localStorage.getItem(EDIT_KEY)!=='0';}catch(e){}
 const MAP={
   stops:r=>({id:r.id,name:r.name,detail:r.detail||'',act:r.act,order:r.sort_order}),
   items:r=>({id:r.id,who:String(r.who).trim(),name:r.name,slot:r.slot,stopId:r.stop_id,how:r.how||'',optional:r.optional,got:r.got,created:r.created})};
