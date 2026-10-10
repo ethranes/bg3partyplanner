@@ -1,0 +1,1363 @@
+{
+ "Adamantine Scimitar": {
+  "name": "Adamantine Scimitar",
+  "wiki": "https://bg3.wiki/wiki/Adamantine_Scimitar",
+  "found": true,
+  "rarity": "rare",
+  "type": "Scimitar",
+  "enchant": "+1",
+  "ac": null,
+  "damage": [
+   "1d6 + 1 Slashing"
+  ],
+  "properties": [
+   "Martial",
+   "Finesse",
+   "Light",
+   "One-Handed",
+   "Dippable"
+  ],
+  "effects": [
+   {
+    "name": "Diamondsbane",
+    "text": "If an adamantine weapon hits an object, the hit is always critical."
+   },
+   {
+    "name": "Lethal Weapon (Slashing)",
+    "text": "This weapon ignores Resistance to Slashing damage."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Flourish",
+    "text": "Bonus Action; recharges on Short Rest. Feint an attack to possibly leave the target Off Balance."
+   },
+   {
+    "name": "Lacerate",
+    "text": "Action; recharges on Short Rest. Slash at your target's vital points to make it Bleed."
+   }
+  ],
+  "description": "Each cut of this blade shines with the wicked glint of adamantine -- a promise for a devastating blow.",
+  "weight": "1.35 kg",
+  "price": "190 gp"
+ },
+ "Adamantine Shield": {
+  "name": "Adamantine Shield",
+  "wiki": "https://bg3.wiki/wiki/Adamantine_Shield",
+  "found": true,
+  "rarity": "rare",
+  "type": "Shield",
+  "enchant": null,
+  "ac": "2",
+  "damage": [],
+  "properties": [
+   "Shields proficiency"
+  ],
+  "effects": [
+   {
+    "name": null,
+    "text": "Attackers cannot land critical hits on the wearer."
+   },
+   {
+    "name": "Adamantine Shield",
+    "text": "When a melee attack misses the wearer, the attacker becomes Reeling for 2 turns."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Shield Bash",
+    "text": "Reaction. When a foe hits you with a melee attack, knock the attacker Prone unless it succeeds a saving throw."
+   }
+  ],
+  "description": "The dull shine of the adamantine promises this shield could take a thousand beatings -- and still look as good as new.",
+  "weight": "2.7 kg",
+  "price": "190 gp"
+ },
+ "Amulet of Restoration": {
+  "name": "Amulet of Restoration",
+  "wiki": "https://bg3.wiki/wiki/Amulet_of_Restoration",
+  "found": true,
+  "rarity": "rare",
+  "type": "Amulet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [],
+  "grants": [
+   {
+    "name": "Healing Word",
+    "text": "Level 1 spell; Bonus Action; once per Long Rest"
+   },
+   {
+    "name": "Mass Healing Word",
+    "text": "Level 3 spell; Bonus Action; once per Long Rest"
+   }
+  ],
+  "description": "The gemstone centrepiece of the amulet was long ago mottled and dyed by the tears of a martyr.",
+  "weight": "0.05 kg",
+  "price": "160 gp"
+ },
+ "Amulet of the Devout": {
+  "name": "Amulet of the Devout",
+  "wiki": "https://bg3.wiki/wiki/Amulet_of_the_Devout",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Amulet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "High Spellcasting (+2)",
+    "text": "You gain a +2 bonus to Spell Save DC."
+   },
+   {
+    "name": "Godswill",
+    "text": "You gain an additional use of Channel Divinity Charge. Once used, it is restored upon taking a Long Rest."
+   }
+  ],
+  "grants": [],
+  "description": "Otto, a member of the powerful arcane organisation the Circle of Eight, had a penchant for amulets…",
+  "weight": "0.05 kg",
+  "price": "65 gp"
+ },
+ "Amulet of the Harpers": {
+  "name": "Amulet of the Harpers",
+  "wiki": "https://bg3.wiki/wiki/Amulet_of_the_Harpers",
+  "found": true,
+  "rarity": "rare",
+  "type": "Amulet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": null,
+    "text": "The wearer has Advantage on Wisdom saving throws."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Shield",
+    "text": "Level 1 spell; Reaction; once per Long Rest"
+   }
+  ],
+  "description": "Nobility can be found in suffering the slings and arrows of outrageous fortune. So can dying. Best to be on guard.",
+  "weight": "0.05 kg",
+  "price": "125 gp"
+ },
+ "Armour of Moonbasking": {
+  "name": "Armour of Moonbasking",
+  "wiki": "https://bg3.wiki/wiki/Armour_of_Moonbasking",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Light Armour",
+  "enchant": null,
+  "ac": "11 + Dex",
+  "damage": [],
+  "properties": [
+   "Light Armour proficiency"
+  ],
+  "effects": [
+   {
+    "name": "Lunar Bestial Vitality",
+    "text": "You gain 22 temporary hit points after casting Wild Shape. While those temporary hit points are active reduce all incoming damage by 1."
+   },
+   {
+    "name": "Lunar Bestial Fortitude",
+    "text": "While in Wild Shape, you have a +2 bonus to Armour Class and Advantage on saving throws against spells."
+   }
+  ],
+  "grants": [],
+  "description": "This armour was designed by lunar-obsessed Cuthbertina, a gnomish arcane smith…",
+  "weight": "4.5 kg",
+  "price": "1400 gp"
+ },
+ "Birthright": {
+  "name": "Birthright",
+  "wiki": "https://bg3.wiki/wiki/Birthright",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Helmet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": null,
+    "text": "Charisma +2 (to a maximum of 22)."
+   }
+  ],
+  "grants": [],
+  "description": "The thing that you poor sods simply cannot grasp is how effortless all this magical hootie-wootie castie-spellsie business…",
+  "weight": "0.5 kg",
+  "price": "410 gp"
+ },
+ "Boots of Stormy Clamour": {
+  "name": "Boots of Stormy Clamour",
+  "wiki": "https://bg3.wiki/wiki/Boots_of_Stormy_Clamour",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Boots",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Arcane Echomalefaction",
+    "text": "When the wearer inflicts a condition upon a hostile creature, they also inflict 2 turns of Reverberation."
+   }
+  ],
+  "grants": [],
+  "description": "Peals of thunder rumble at the back of your skull with every step taken in these boots.",
+  "weight": "0.55 kg",
+  "price": "70 gp"
+ },
+ "Bow of Awareness": {
+  "name": "Bow of Awareness",
+  "wiki": "https://bg3.wiki/wiki/Bow_of_Awareness",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Shortbow",
+  "enchant": "+1",
+  "ac": null,
+  "damage": [
+   "1d6 + 1 Piercing"
+  ],
+  "properties": [
+   "Simple",
+   "Two-Handed",
+   "Range 18 m",
+   "Dippable"
+  ],
+  "effects": [
+   {
+    "name": "Seldom Caught Unawares (+1)",
+    "text": "You gain a +1 bonus to Initiative rolls."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Hamstring Shot",
+    "text": "Action; recharges on Short Rest. Shoot an enemy in the thigh and possibly reduce their movement speed by 50%."
+   }
+  ],
+  "description": "This halfling bow requires a full draw for smaller folk, but serves as a quick off-hand for those of greater height.",
+  "weight": "0.9 kg",
+  "price": "65 gp"
+ },
+ "Broodmother's Revenge": {
+  "name": "Broodmother's Revenge",
+  "wiki": "https://bg3.wiki/wiki/Broodmother%27s_Revenge",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Amulet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Venomous Revenge",
+    "text": "When the wearer is healed, their weapon is coated in magic and deals an extra 1d6 Poison damage for 3 turns."
+   }
+  ],
+  "grants": [],
+  "description": "Each of this amulet's jewels shines like a viper's eyes.",
+  "weight": "0.05 kg",
+  "price": "65 gp"
+ },
+ "Callous Glow Ring": {
+  "name": "Callous Glow Ring",
+  "wiki": "https://bg3.wiki/wiki/Callous_Glow_Ring",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Ring",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Callous Glow",
+    "text": "The wearer deals an additional 2 points of Radiant damage against creatures that are illuminated."
+   }
+  ],
+  "grants": [],
+  "description": "A grudging gleam emits from this ring - more an indictment of light than an endorsement.",
+  "weight": "0.05 kg",
+  "price": "40 gp"
+ },
+ "Cindermoth Cloak": {
+  "name": "Cindermoth Cloak",
+  "wiki": "https://bg3.wiki/wiki/Cindermoth_Cloak",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Cloak",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Flaming Shroud",
+    "text": "A creature that damages the wearer within 2 m (7 ft) receives Burning for 2 turns (1d4 Fire damage per turn; DC 12 Dexterity saving throw)."
+   }
+  ],
+  "grants": [],
+  "description": "With every rustle of this cloak, small moths like windblown embers appear around you.",
+  "weight": "0.5 kg",
+  "price": "70 gp"
+ },
+ "Cloak of Displacement": {
+  "name": "Cloak of Displacement",
+  "wiki": "https://bg3.wiki/wiki/Cloak_of_Displacement",
+  "found": true,
+  "rarity": "rare",
+  "type": "Cloak",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Displacement",
+    "text": "At the beginning of the wearer's turn, the cloak activates, granting enemies Disadvantage on Attack Rolls that target the wearer. Lasts until the wearer takes damage."
+   }
+  ],
+  "grants": [],
+  "description": "The fur is so blue as to be almost black. When mantled across your shoulders, the patterns on the cloak seem to shift and ripple.",
+  "weight": "0.5 kg",
+  "price": "190 gp"
+ },
+ "Cloak of Protection": {
+  "name": "Cloak of Protection",
+  "wiki": "https://bg3.wiki/wiki/Cloak_of_Protection",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Cloak",
+  "enchant": null,
+  "ac": "+1",
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": null,
+    "text": "Armour Class +1"
+   },
+   {
+    "name": null,
+    "text": "Saving Throw +1"
+   }
+  ],
+  "grants": [],
+  "description": "Otiluke and Bigby, members of the Circle of Eight, once made a bet: Bigby bet Otiluke that he couldn't suck thirteen litres of vodka out of a protection cloak like this one. Bigby won.",
+  "weight": "0.5 kg",
+  "price": "200 gp"
+ },
+ "Cloak of the Weave": {
+  "name": "Cloak of the Weave",
+  "wiki": "https://bg3.wiki/wiki/Cloak_of_the_Weave",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Cloak",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Arcane Enchantment (+1)",
+    "text": "You gain a +1 bonus to Spell Save DC and Spell Attack rolls."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Absorb Elements",
+    "text": "Reaction, once per Short Rest. Take half damage from the next elemental attack targeting you and deal an additional 1d6 of that element type on your next attack."
+   }
+  ],
+  "description": "Part of an outfit worn by the wizard Tenser when he was inducted into the organization of eminent wizards called the Circle of Eight.",
+  "weight": "0.5 kg",
+  "price": "300 gp"
+ },
+ "Coldbrim Hat": {
+  "name": "Coldbrim Hat",
+  "wiki": "https://bg3.wiki/wiki/Coldbrim_Hat",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Helmet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Coldbrim Chill",
+    "text": "Once per turn, any condition inflicted on a target, also applies 2 turns of Encrusted with Frost."
+   }
+  ],
+  "grants": [],
+  "description": "Upturning the hat and gazing into it, you get this slightly vertiginous feeling.",
+  "weight": "0.5 kg",
+  "price": "90 gp"
+ },
+ "Coruscation Ring": {
+  "name": "Coruscation Ring",
+  "wiki": "https://bg3.wiki/wiki/Coruscation_Ring",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Ring",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Arcane Radiance",
+    "text": "When the wearer deals spell damage while illuminated by a light source, they also inflict Radiating Orb upon the target for 2 turns."
+   }
+  ],
+  "grants": [],
+  "description": "Provocative light blooms from the engraved contours of this ring.",
+  "weight": "0.05 kg",
+  "price": "40 gp"
+ },
+ "Crusher's Ring": {
+  "name": "Crusher's Ring",
+  "wiki": "https://bg3.wiki/wiki/Crusher's_Ring",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Ring",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": null,
+    "text": "Movement Speed increased by 3 m (10 ft)."
+   }
+  ],
+  "grants": [],
+  "description": "Though caked with mud and grime, the ring smells faintly of lavender. Remarkable, considering where it's been.",
+  "weight": "0.05 kg",
+  "price": "40 gp"
+ },
+ "Disintegrating Night Walkers": {
+  "name": "Disintegrating Night Walkers",
+  "wiki": "https://bg3.wiki/wiki/Disintegrating_Night_Walkers",
+  "found": true,
+  "rarity": "story",
+  "type": "Boots",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Night Walker",
+    "text": "The affected creature cannot be Enwebbed, Entangled, or Ensnared and cannot slip on Grease or Ice."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Misty Step",
+    "text": "Bonus Action; level 2 spell; recharges on Short Rest"
+   }
+  ],
+  "description": "Darker than a starless night, Night Walkers are made for secrecy in the honour of Shar.",
+  "weight": "0.55 kg",
+  "price": "360 gp"
+ },
+ "Gloves of Belligerent Skies": {
+  "name": "Gloves of Belligerent Skies",
+  "wiki": "https://bg3.wiki/wiki/Gloves_of_Belligerent_Skies",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Gloves",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Thunderous Conversion",
+    "text": "When the wearer deals Thunder, Lightning, or Radiant damage, inflict 2 turns of Reverberation upon the target(s)."
+   }
+  ],
+  "grants": [],
+  "description": "Balling your fingers into fists while wearing these gloves causes a sonorous chime, like a tempest and a church bell ringing inside your skull.",
+  "weight": "0.5 kg",
+  "price": "90 gp"
+ },
+ "Haste Helm": {
+  "name": "Haste Helm",
+  "wiki": "https://bg3.wiki/wiki/Haste_Helm",
+  "found": true,
+  "rarity": "rare",
+  "type": "Helmet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Smooth Start",
+    "text": "At the start of combat, the wearer gains Momentum for 3 turns."
+   },
+   {
+    "name": "Momentum",
+    "text": "Spurred on by a sense of urgency. Movement Speed increased by 1.5 m (5 ft) for each remaining turn of the effect; ends if the wearer becomes Restrained, Incapacitated, Prone or slowed."
+   }
+  ],
+  "grants": [],
+  "description": "The helm throbs when violence is near, filling the wearer with a compulsion to act.",
+  "weight": "0.5 kg",
+  "price": "240 gp"
+ },
+ "Holy Lance Helm": {
+  "name": "Holy Lance Helm",
+  "wiki": "https://bg3.wiki/wiki/Holy_Lance_Helm",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Helmet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [
+   "Medium Armour proficiency"
+  ],
+  "effects": [
+   {
+    "name": null,
+    "text": "+1 bonus to Constitution Saving Throws."
+   },
+   {
+    "name": "Smite the Graceless",
+    "text": "Creatures who miss their Attack Rolls against the wearer must succeed a DC 14 Dexterity saving throw or take 1d4 Radiant damage."
+   }
+  ],
+  "grants": [],
+  "description": "Brief halos of divine light wrap your head when you don and doff this helmet.",
+  "weight": "1 kg",
+  "price": "115 gp"
+ },
+ "Hood of the Weave": {
+  "name": "Hood of the Weave",
+  "wiki": "https://bg3.wiki/wiki/Hood_of_the_Weave",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Helmet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Arcane Enchantment (+2)",
+    "text": "You gain a +2 bonus to Spell Save DC and Spell Attack rolls."
+   }
+  ],
+  "grants": [],
+  "description": "Worn by the Tenser when he was inducted into the Circle of Eight.",
+  "weight": "0.5 kg",
+  "price": "1450 gp"
+ },
+ "Justiciar's Scimitar": {
+  "name": "Justiciar's Scimitar",
+  "wiki": "https://bg3.wiki/wiki/Justiciar%27s_Scimitar",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Scimitar",
+  "enchant": "+2",
+  "ac": null,
+  "damage": [
+   "1d6 + 2 Slashing"
+  ],
+  "properties": [
+   "Finesse",
+   "Light",
+   "Dippable",
+   "Melee, 1.5 m"
+  ],
+  "effects": [
+   {
+    "name": "Shadow-Blinding",
+    "text": "If you attack with Advantage, you have a chance to Blind your target."
+   },
+   {
+    "name": "Shadow Blade",
+    "text": "You have Advantage on Attack Rolls against Lightly or Heavily Obscured targets when using this blade."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Shadowsoaked Blow",
+    "text": "Action. Strike an enemy, adding your proficiency bonus to the damage; on a hit deals an additional 1d6 Psychic. Doesn't break concealment. Once per Short Rest."
+   },
+   {
+    "name": "Backbreaker",
+    "text": "Weapon action. Action, once per Short Rest. Put extra force behind your strike to possibly knock your enemy Prone."
+   },
+   {
+    "name": "Flourish",
+    "text": "Weapon action. Bonus Action, once per Short Rest. Feint an attack to possibly throw your opponent Off Balance."
+   }
+  ],
+  "description": "This light, curved blade is as unusual and unforgiving as the Darkness it strikes from.",
+  "weight": "1.35 kg",
+  "price": "480 gp"
+ },
+ "Ketheric's Shield": {
+  "name": "Ketheric's Shield",
+  "wiki": "https://bg3.wiki/wiki/Ketheric%27s_Shield",
+  "found": true,
+  "rarity": "rare",
+  "type": "Shield",
+  "enchant": null,
+  "ac": "2",
+  "damage": [],
+  "properties": [
+   "Shields proficiency"
+  ],
+  "effects": [
+   {
+    "name": null,
+    "text": "Advantage on Dexterity Saving Throws."
+   },
+   {
+    "name": "Arcane Enchantment (+1)",
+    "text": "You gain a +1 bonus to Spell Save DC and Spell Attack rolls."
+   },
+   {
+    "name": "Shield Bash",
+    "text": "When a foe hits the wearer with a melee attack, the wearer can use a reaction to knock them Prone unless they succeed a Dexterity saving throw."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Shield Bash",
+    "text": "Reaction, triggered when hit by a melee attack."
+   }
+  ],
+  "description": "In the theatre of dreams, Ketheric killed his wife every night.",
+  "weight": "2.7 kg",
+  "price": "300 gp"
+ },
+ "Key of the Ancients": {
+  "name": "Key of the Ancients",
+  "wiki": "https://bg3.wiki/wiki/Key_of_the_Ancients",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Helmet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": null,
+    "text": "+1 bonus to Nature checks."
+   },
+   {
+    "name": null,
+    "text": "While standing in front of the stone door in Nettie's room in the Druid Grove, the wearer can open a shortcut to the Underground Passage."
+   }
+  ],
+  "grants": [],
+  "description": "The branches of this circlet are half-fossilised, passed down through generations of druids.",
+  "weight": "0.5 kg",
+  "price": "90 gp"
+ },
+ "Luminous Armour": {
+  "name": "Luminous Armour",
+  "wiki": "https://bg3.wiki/wiki/Luminous_Armour",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Medium Armour",
+  "enchant": "+1",
+  "ac": "15 + Dex (max 2)",
+  "damage": [],
+  "properties": [
+   "Medium Armour proficiency"
+  ],
+  "effects": [
+   {
+    "name": "Radiating Shockwave",
+    "text": "When the wearer deals Radiant damage, they cause a Radiant Shockwave."
+   }
+  ],
+  "grants": [],
+  "description": "Many an adventurer has found themselves swallowed up by the dark throat of some nameless dungeon, aching for a glimpse of light.",
+  "weight": "9 kg",
+  "price": "250 gp"
+ },
+ "Markoheshkir": {
+  "name": "Markoheshkir",
+  "wiki": "https://bg3.wiki/wiki/Markoheshkir",
+  "found": true,
+  "rarity": "legendary",
+  "type": "Quarterstaff",
+  "enchant": "+2",
+  "ac": null,
+  "damage": [
+   "1d6 + 2 Bludgeoning (one-handed)",
+   "1d8 + 2 Bludgeoning (two-handed)"
+  ],
+  "properties": [
+   "Versatile",
+   "Dippable",
+   "Simple weapon",
+   "Melee, 1.5 m"
+  ],
+  "effects": [
+   {
+    "name": "Arcane Enchantment (+1)",
+    "text": "You gain a +1 bonus to Spell Save DC and Spell Attack rolls."
+   },
+   {
+    "name": "Arcane Battery",
+    "text": "Alleviate the arcane burden of spellcasting with the power of this staff. The next spell you cast doesn't cost a spell slot."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Kereska's Favour",
+    "text": "Action, once per Short Rest. Imbue yourself with elemental energy sourced from the draconic goddess, Kereska."
+   },
+   {
+    "name": "Topple",
+    "text": "Weapon action. Action, once per Short Rest. Swipe at a creature to knock it Prone."
+   }
+  ],
+  "description": "Kereska, draconic goddess of arcane knowledge, imbues many chromatic dragons with their magic.",
+  "weight": "1.8 kg",
+  "price": "640 gp"
+ },
+ "Melf's First Staff": {
+  "name": "Melf's First Staff",
+  "wiki": "https://bg3.wiki/wiki/Melf%27s_First_Staff",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Quarterstaff",
+  "enchant": "+1",
+  "ac": null,
+  "damage": [
+   "1d6 + 1 Bludgeoning (one-handed)",
+   "1d8 + 1 Bludgeoning (two-handed)"
+  ],
+  "properties": [
+   "Versatile",
+   "Dippable",
+   "Simple weapon",
+   "Melee, 1.5 m"
+  ],
+  "effects": [
+   {
+    "name": "Arcane Enchantment (+1)",
+    "text": "You gain a +1 bonus to Spell Save DC and Spell Attack rolls."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Melf's Acid Arrow",
+    "text": "Level 2 spell. Action, once per Long Rest."
+   },
+   {
+    "name": "Topple",
+    "text": "Weapon action. Action, once per Short Rest. Swipe at a creature to knock it Prone."
+   }
+  ],
+  "description": "In spite of (or perhaps because of) his suspiciously amusing name, the wizard Melf was actually quite a talented spellcaster and innovator in the field of the arcane.",
+  "weight": "1.8 kg",
+  "price": "100 gp"
+ },
+ "Mourning Frost": {
+  "name": "Mourning Frost",
+  "wiki": "https://bg3.wiki/wiki/Mourning_Frost",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Quarterstaff",
+  "enchant": "+1",
+  "ac": null,
+  "damage": [
+   "1d6 + 1 Bludgeoning (one-handed)",
+   "1d8 + 1 Bludgeoning (two-handed)",
+   "1d4 Cold"
+  ],
+  "properties": [
+   "Versatile",
+   "Dippable",
+   "Simple weapon",
+   "Melee, 1.5 m"
+  ],
+  "effects": [
+   {
+    "name": "Heart of Ice",
+    "text": "When dealing Cold damage, the wielder deals an additional 1 Cold."
+   },
+   {
+    "name": "Insidious Cold",
+    "text": "Dealing Cold damage with a spell possibly inflicts Chilled upon the target."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Ray of Frost",
+    "text": "Cantrip, castable at will. Action."
+   },
+   {
+    "name": "Topple",
+    "text": "Weapon action. Action, once per Short Rest. Swipe at a creature to knock it Prone."
+   }
+  ],
+  "description": "The air around this staff crackles with a cold, frosty wind - a power that has been divided for too long, and is waiting to be released.",
+  "weight": "1.8 kg",
+  "price": "770 gp"
+ },
+ "Necklace of Elemental Augmentation": {
+  "name": "Necklace of Elemental Augmentation",
+  "wiki": "https://bg3.wiki/wiki/Necklace_of_Elemental_Augmentation",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Amulet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Elemental Augmentation",
+    "text": "When one of your cantrips deals Acid, Cold, Fire, Lightning, or Thunder damage, add your Spellcasting Modifier to the damage dealt."
+   }
+  ],
+  "grants": [],
+  "description": "The tourmaline in this necklace is almost uncomfortably hot, warmed by a heat all its own.",
+  "weight": "0.05 kg",
+  "price": "65 gp"
+ },
+ "Potent Robe": {
+  "name": "Potent Robe",
+  "wiki": "https://bg3.wiki/wiki/Potent_Robe",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Clothing",
+  "enchant": null,
+  "ac": "10 + Dex",
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": null,
+    "text": "Armour Class +1"
+   },
+   {
+    "name": "Gregarious Caster",
+    "text": "Your cantrips deal additional damage equal to your Charisma Modifier."
+   },
+   {
+    "name": "Well-Liked and Well-Fortified",
+    "text": "At the start of the wearer's turn, the robe activates, granting them Temporary Hit Points equal to their Charisma Modifier."
+   }
+  ],
+  "grants": [],
+  "description": "This robe is a difficult look to pull off unless one is blessed with an otherwordly charisma.",
+  "weight": "1.8 kg",
+  "price": "1600 gp"
+ },
+ "Ring of Mental Inhibition": {
+  "name": "Ring of Mental Inhibition",
+  "wiki": "https://bg3.wiki/wiki/Ring_of_Mental_Inhibition",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Ring",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Mental Inhibition",
+    "text": "When a foe fails a Saving Throw against one of your spells or actions, they gain Mental Fatigue for 2 turns."
+   }
+  ],
+  "grants": [],
+  "description": "The patterns in the ring's swirling metal make your head spin whenever you look at them for too long.",
+  "weight": "0.05 kg",
+  "price": "40 gp"
+ },
+ "Ring of Protection": {
+  "name": "Ring of Protection",
+  "wiki": "https://bg3.wiki/wiki/Ring_of_Protection",
+  "found": true,
+  "rarity": "rare",
+  "type": "Ring",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": null,
+    "text": "Armour Class +1"
+   },
+   {
+    "name": null,
+    "text": "Saving Throw +1"
+   }
+  ],
+  "grants": [],
+  "description": "Elegant motifs of warding - shields, targes, bucklers, and buffers - are faintly impressed into the metal round of the ring.",
+  "weight": "0.05 kg",
+  "price": "70 gp"
+ },
+ "Ring of Regeneration": {
+  "name": "Ring of Regeneration",
+  "wiki": "https://bg3.wiki/wiki/Ring_of_Regeneration",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Ring",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Combat Regeneration",
+    "text": "At the beginning of your turn, the ring activates and heals you 1d4 Hit Points."
+   }
+  ],
+  "grants": [],
+  "description": "This ring is, in effect, a tiny field medic that won't charge you 70 gold pieces for a fifteen-minute consultation.",
+  "weight": "0.05 kg",
+  "price": "360 gp"
+ },
+ "Robe of the Weave": {
+  "name": "Robe of the Weave",
+  "wiki": "https://bg3.wiki/wiki/Robe_of_the_Weave",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Clothing",
+  "enchant": null,
+  "ac": "10 + Dex",
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": null,
+    "text": "Armour Class +2"
+   },
+   {
+    "name": "Arcane Enchantment",
+    "text": "You gain a +1 bonus to Spell Save DC and Spell Attack rolls."
+   },
+   {
+    "name": "Weave Eater",
+    "text": "Whenever the wearer succeeds a Saving Throw against a spell, they regain 1d6 Hit Points."
+   }
+  ],
+  "grants": [],
+  "description": "Earnest little Edith Cluckle was a small girl when she asked to be the great wizard Otiluke's apprentice.",
+  "weight": "1.8 kg",
+  "price": "2900 gp"
+ },
+ "Safeguard Shield": {
+  "name": "Safeguard Shield",
+  "wiki": "https://bg3.wiki/wiki/Safeguard_Shield",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Shield",
+  "enchant": null,
+  "ac": "2",
+  "damage": [],
+  "properties": [
+   "Shields proficiency"
+  ],
+  "effects": [
+   {
+    "name": null,
+    "text": "Saving Throws +1"
+   }
+  ],
+  "grants": [],
+  "description": "Magic got caught in this heirloom by being exposed to too many wizard family dinners.",
+  "weight": "2.7 kg",
+  "price": "55 gp"
+ },
+ "Scimitar +1": {
+  "name": "Scimitar +1",
+  "wiki": "https://bg3.wiki/wiki/Scimitar_+1",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Scimitar",
+  "enchant": "+1",
+  "ac": null,
+  "damage": [
+   "1d6 + 1 Slashing (one-handed)"
+  ],
+  "properties": [
+   "Finesse",
+   "Light",
+   "Dippable",
+   "Melee (1.5 m)",
+   "Martial Weapon proficiency"
+  ],
+  "effects": [],
+  "grants": [
+   {
+    "name": "Flourish",
+    "text": "Bonus Action; recharges on Short Rest. Feint an attack to possibly knock the target Off Balance."
+   },
+   {
+    "name": "Lacerate",
+    "text": "Action; recharges on Short Rest. Strike at the target's vital points to make it Bleed."
+   }
+  ],
+  "description": "The phases of the moon are carved into the hilt of this scimitar, betraying a druid's careful hand.",
+  "weight": "1.35 kg",
+  "price": "40 gp"
+ },
+ "Sentinel Shield": {
+  "name": "Sentinel Shield",
+  "wiki": "https://bg3.wiki/wiki/Sentinel_Shield",
+  "found": true,
+  "rarity": "rare",
+  "type": "Shield",
+  "enchant": null,
+  "ac": "2",
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Heightened Awareness",
+    "text": "Gain a +3 bonus to Initiative rolls and Advantage on Perception Checks."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Shield Blow",
+    "text": "Reaction. When struck by a melee attack, your attacker must succeed a Dexterity Saving Throw or fall Prone."
+   }
+  ],
+  "description": "Clever enchantments dance between the grooves of this shield, which emanates a magic of heightened awareness.",
+  "weight": "2.7 kg",
+  "price": "580 gp"
+ },
+ "Shapeshifter Hat": {
+  "name": "Shapeshifter Hat",
+  "wiki": "https://bg3.wiki/wiki/Shapeshifter_Hat",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Helmet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": null,
+    "text": "Nature +1"
+   },
+   {
+    "name": "Nature's Embrace",
+    "text": "Increase your Wild Shape Charge by 1. This additional charge is restored upon taking a Long Rest."
+   }
+  ],
+  "grants": [],
+  "description": "Trust is the most fundamental part of wild-shaping. Not trusting others, but trusting yourself.",
+  "weight": "0.5 kg",
+  "price": "70 gp"
+ },
+ "Snowburst Ring": {
+  "name": "Snowburst Ring",
+  "wiki": "https://bg3.wiki/wiki/Snowburst_Ring",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Ring",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Snowburst",
+    "text": "When the wearer deals Cold damage, they also create a 4.5 m (15 ft) circle of Ice around the target(s)."
+   }
+  ],
+  "grants": [],
+  "description": "A series of names have been scratched out, one after the other, on the inside of the ring. The last word, untouched, is not a name. It simply reads: Mine.",
+  "weight": "0.05 kg",
+  "price": "40 gp"
+ },
+ "Spellcrux Amulet": {
+  "name": "Spellcrux Amulet",
+  "wiki": "https://bg3.wiki/wiki/Spellcrux_Amulet",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Amulet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [],
+  "grants": [
+   {
+    "name": "Spell Slot Restoration",
+    "text": "Replenish an expended spell slot of any level. Bonus Action, once per Long Rest."
+   }
+  ],
+  "description": "Some scholars have speculated that spells have a mind of their own, suggesting that the spells get bored…",
+  "weight": "0.05 kg",
+  "price": "210 gp"
+ },
+ "The Graceful Cloth": {
+  "name": "The Graceful Cloth",
+  "wiki": "https://bg3.wiki/wiki/The_Graceful_Cloth",
+  "found": true,
+  "rarity": "rare",
+  "type": "Clothing",
+  "enchant": null,
+  "ac": "10 + Dex",
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Cat's Grace",
+    "text": "You gain Cat's Grace and increase your Dexterity by 2, to a maximum of 20. Cat's Grace grants Advantage on Dexterity Checks and halves falling damage."
+   },
+   {
+    "name": "Nimble As a Cat",
+    "text": "You gain a +1 bonus to your Dexterity Saving Throws and also increase your Jump distance by 1.5 m (5 ft)."
+   }
+  ],
+  "grants": [],
+  "description": "A garment worn by one of three monks who fought together against Headless Serpent, Secret Venom, a gang in the port city of Nyanzaru. This was worn by Roahton Mobar, whose stances were broad and strong.",
+  "weight": "1.8 kg",
+  "price": "800 gp"
+ },
+ "The Protecty Sparkswall": {
+  "name": "The Protecty Sparkswall",
+  "wiki": "https://bg3.wiki/wiki/The_Protecty_Sparkswall",
+  "found": true,
+  "rarity": "rare",
+  "type": "Clothing",
+  "enchant": null,
+  "ac": "10 + Dex",
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "High Spellcasting",
+    "text": "+1 bonus to Spell Save DC."
+   },
+   {
+    "name": "Sparkswall Armour",
+    "text": "+1 bonus to Armour Class and Saving Throws while the wearer has Lightning Charges."
+   }
+  ],
+  "grants": [],
+  "description": "Yrre the Sparkstruck was raised in the Underdark, so they weren't surprised that power begets envy…",
+  "weight": "1.8 kg",
+  "price": "260 gp"
+ },
+ "The Shadespell Circlet": {
+  "name": "The Shadespell Circlet",
+  "wiki": "https://bg3.wiki/wiki/The_Shadespell_Circlet",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Helmet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Shadespell",
+    "text": "While the wearer is obscured in shadow, their spells gain a +1 bonus to Spell Save DC, making them more likely to succeed."
+   }
+  ],
+  "grants": [],
+  "description": "One of the relics of Deep Duerra's rebellious children. Flanked by her court, Duerra shook her head at her children…",
+  "weight": "0.5 kg",
+  "price": "90 gp"
+ },
+ "The Spellsparkler": {
+  "name": "The Spellsparkler",
+  "wiki": "https://bg3.wiki/wiki/The_Spellsparkler",
+  "found": true,
+  "rarity": "rare",
+  "type": "Quarterstaff",
+  "enchant": null,
+  "ac": null,
+  "damage": [
+   "1d6 Bludgeoning (one-handed)",
+   "1d8 Bludgeoning (two-handed)"
+  ],
+  "properties": [
+   "Versatile",
+   "Simple Weapon",
+   "Melee"
+  ],
+  "effects": [
+   {
+    "name": "Electric Veins",
+    "text": "When the wielder deals damage with a spell or cantrip, they gain 2 Lightning Charges."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Topple",
+    "text": "Swipe at a creature to knock it Prone. Action; recharges on Short Rest."
+   }
+  ],
+  "description": "Yrre the Sparkstruck intended to give the Spellsparkler to Lenore, a cleric of Mystra and old lover…",
+  "weight": "1.8 kg",
+  "price": "310 gp"
+ },
+ "The Whispering Promise": {
+  "name": "The Whispering Promise",
+  "wiki": "https://bg3.wiki/wiki/The_Whispering_Promise",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Ring",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Blessed Mercy",
+    "text": "When you heal a creature, it gains a +1d4 bonus to Attack Rolls and Saving Throws for 2 turns."
+   }
+  ],
+  "grants": [],
+  "description": "A soft, soothing voice floats from this ring, reciting a prayer over and over.",
+  "weight": "0.05 kg",
+  "price": "40 gp"
+ },
+ "Thunderskin Cloak": {
+  "name": "Thunderskin Cloak",
+  "wiki": "https://bg3.wiki/wiki/Thunderskin_Cloak",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Cloak",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Dazing Echo",
+    "text": "When a creature with Reverberation damages the wearer, that creature must succeed a DC 13 Constitution Saving Throw or become Dazed."
+   }
+  ],
+  "grants": [],
+  "description": "Through a gap in the long snarls of thread, you are sure you can glimpse a great black thunderhead…",
+  "weight": "0.5 kg",
+  "price": "75 gp"
+ },
+ "Titanstring Bow": {
+  "name": "Titanstring Bow",
+  "wiki": "https://bg3.wiki/wiki/Titanstring_Bow",
+  "found": true,
+  "rarity": "rare",
+  "type": "Longbow",
+  "enchant": "+1",
+  "ac": null,
+  "damage": [
+   "1d8 + 1 Piercing"
+  ],
+  "properties": [
+   "Two-Handed",
+   "Martial Weapon",
+   "Ranged",
+   "Range 18 m (60 ft)"
+  ],
+  "effects": [
+   {
+    "name": "Titan Weapon",
+    "text": "This weapon deals additional damage equal to your Strength Modifier."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Brace (Ranged)",
+    "text": "Spend 6 m (20 ft) of movement; ranged damage rolls are rolled twice, using the higher result, for the rest of the turn. Recharges on Short Rest."
+   },
+   {
+    "name": "Hamstring Shot",
+    "text": "Shoot an enemy in the thigh, possibly halving their movement speed. Action; recharges on Short Rest."
+   },
+   {
+    "name": "Pushing Attack (Ranged)",
+    "text": "Push the target 4.5 m (15 ft) away. Action; recharges on Short Rest."
+   }
+  ],
+  "description": "The commonly held belief that archers are rangey, thin-wristed people is completely false. It takes years of training to pull a bowstring all the way back to your cheekbone, and wrists like iron.",
+  "weight": "1.1 kg",
+  "price": "310 gp"
+ },
+ "Viconia's Walking Fortress": {
+  "name": "Viconia's Walking Fortress",
+  "wiki": "https://bg3.wiki/wiki/Viconia's_Walking_Fortress",
+  "found": true,
+  "rarity": "legendary",
+  "type": "Shield",
+  "enchant": null,
+  "ac": "3",
+  "damage": [],
+  "properties": [
+   "Shields proficiency"
+  ],
+  "effects": [
+   {
+    "name": "Spellguard",
+    "text": "You have Advantage on Saving Throws against spells. Spell attack rolls against you have Disadvantage."
+   },
+   {
+    "name": "Rebuke of the Mighty",
+    "text": "When a foe hits you with a melee attack, you can use your reaction to deal 2d4 Force damage; the attacker is knocked Prone unless they pass a Dexterity Saving Throw."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Reflective Shell",
+    "text": "A protective shell reflects any projectiles targeted at you back to their point of origin. Bonus Action; recharges on Short Rest."
+   },
+   {
+    "name": "Warding Bond",
+    "text": "Ward an ally: resistance to all damage and +1 to Armour Class and Saving Throws. Action; recharges on Long Rest."
+   }
+  ],
+  "description": "'Walking Fortress' is a defensive technique reliant on a shield of this caliber…",
+  "weight": "2.7 kg",
+  "price": "760 gp"
+ },
+ "Winter's Clutches": {
+  "name": "Winter's Clutches",
+  "wiki": "https://bg3.wiki/wiki/Winter's_Clutches",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Gloves",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Winter's Clutches",
+    "text": "When the wearer deals Cold damage, they inflict 2 turns of Encrusted with Frost upon the target(s)."
+   }
+  ],
+  "grants": [],
+  "description": "Likely originated in Icewind Dale, where tempers run as hot as hearths, and frozen rivers trace the arm of the dale…",
+  "weight": "0.5 kg",
+  "price": "90 gp"
+ }
+}

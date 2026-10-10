@@ -165,6 +165,35 @@ ul.list b,.kv b,.tbl b{color:var(--ink)}
   .item .acts{grid-column:2;justify-content:flex-start}
 }
 
+/* item tooltip: styled after the in-game BG3 item panel, so it stays dark in both themes */
+.iname{appearance:none;font:inherit;font-weight:700;font-size:16px;color:inherit;background:none;border:0;padding:0;margin:0;text-align:left;cursor:pointer;text-decoration:underline dotted;text-decoration-color:var(--muted);text-underline-offset:3px}
+.iname:hover{text-decoration-style:solid;text-decoration-color:currentColor}
+.item.got .iname{text-decoration:line-through;text-decoration-thickness:2px;color:var(--muted)}
+td .iname{font-weight:400;font-size:inherit}
+.tip{--r:#C8C8C8;position:fixed;z-index:25;width:min(340px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;
+  background:linear-gradient(180deg,#221B14 0%,#15110D 100%);color:#D8CDB8;border:1px solid #6E5A3A;border-radius:4px;
+  box-shadow:0 0 0 1px #000,inset 0 0 0 1px rgba(201,168,106,.12),0 14px 36px rgba(0,0,0,.55);font-size:14px;line-height:1.45;padding:14px 16px 12px}
+.tip[data-rarity="uncommon"]{--r:#3DBE5A}.tip[data-rarity="rare"]{--r:#45A6F2}.tip[data-rarity="very rare"]{--r:#D45AB0}.tip[data-rarity="legendary"]{--r:#DDAE45}.tip[data-rarity="story"]{--r:#F0803C}
+.tip::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:var(--r);opacity:.85}
+.tip h4{font-family:var(--f-display);font-size:22px;font-weight:700;line-height:1.1;margin:2px 0 4px;color:var(--r);text-wrap:balance}
+.tip .t-sub{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#A8997F;display:flex;flex-wrap:wrap;gap:2px 10px}
+.tip .t-sub .rar{color:var(--r)}
+.tip .t-big{display:flex;flex-direction:column;gap:2px;margin-top:10px;padding:8px 0;border-block:1px solid rgba(201,168,106,.22)}
+.tip .t-big b{font-family:var(--f-display);font-size:20px;color:#F1E6CF;font-weight:700}
+.tip .t-big span{font-size:12.5px;color:#A8997F}
+.tip .t-props{margin-top:8px;font-size:13px;color:#A8997F}
+.tip ul{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.tip li b{color:#E3C47E}
+.tip .t-grant b{color:#9FC6E8}
+.tip .t-desc{margin-top:12px;font-style:italic;color:#A8997F;font-size:13.5px}
+.tip .t-foot{margin-top:12px;padding-top:8px;border-top:1px solid rgba(201,168,106,.22);display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;font-family:var(--f-mono);font-size:11.5px;color:#A8997F}
+.tip .t-foot a{color:#E3C47E;margin-left:auto}
+.tip .t-none{margin-top:10px;color:#A8997F}
+.tip .t-x{position:absolute;top:6px;right:6px;appearance:none;background:none;border:0;color:#A8997F;font-size:22px;line-height:1;width:36px;height:36px;cursor:pointer;border-radius:4px}
+.tip .t-x:hover{color:#F1E6CF}
+.tip-scrim{position:fixed;inset:0;z-index:24;background:rgba(10,14,12,.5)}
+.tip.sheetmode{left:50%!important;top:auto!important;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-height:min(78vh,calc(100vh - 24px))}
+
 /* sheet (add/edit form) */
 .scrim{position:fixed;inset:0;background:rgba(10,14,12,.5);z-index:20;display:flex;align-items:flex-end;justify-content:center;padding:16px}
 @media (min-width:700px){.scrim{align-items:center}}
@@ -247,6 +276,87 @@ const sortedStops=()=>[...S.stops].sort((a,b)=>(a.act-b.act)||(a.order-b.order))
 const itemsFor=(pred)=>S.items.filter(pred).sort((a,b)=>{const sa=stopById(a.stopId),sb=stopById(b.stopId);const oa=sa?sa.act*1e6+sa.order:9e9,ob=sb?sb.act*1e6+sb.order:9e9;return (oa-ob)||((a.created||0)-(b.created||0));});
 const writable=()=>S.editing&&!!S.db&&S.status!=='offline';
 
+/* ---------- item tooltips ----------
+   Stats come from bg3.wiki, saved in item-stats.json (keyed by item name). Hover shows the panel on a
+   mouse; a tap or click pins it (a bottom sheet on touch screens). Items with no match show only what we know. */
+let STATS={};
+const normName=s=>String(s||'').toLowerCase().replace(/[’']/g,'').replace(/[^a-z0-9+]+/g,' ').trim();
+const statsFor=name=>STATS[normName(name)]||null;
+const tipBtn=name=>`<button type="button" class="name iname" data-tip="${esc(name)}" aria-haspopup="dialog">${esc(name)}</button>`;
+const canHover=matchMedia('(hover:hover) and (pointer:fine)');
+const TIP={el:null,scrim:null,anchor:null,pinned:false,hideT:null};
+function tipHTML(name){
+  const s=statsFor(name);const it=S.items.find(i=>normName(i.name)===normName(name));
+  const x='<button type="button" class="t-x" data-tipclose aria-label="Close">×</button>';
+  if(!s||s.found===false){
+    const st=it&&stopById(it.stopId);
+    return `${x}<h4>${esc(name)}</h4><div class="t-sub">${it?`<span>${esc(it.slot)}</span>`:''}</div>
+      <p class="t-none">No stats for this item yet: it didn't match a bg3.wiki page.${st?` Found at ${esc(st.name)}.`:''}</p>
+      <div class="t-foot"><a href="https://bg3.wiki/w/index.php?search=${encodeURIComponent(name)}" target="_blank" rel="noopener">Search bg3.wiki</a></div>`;
+  }
+  const list=(a,cls)=>(a||[]).map(e=>`<li class="${cls}">${e.name?`<b>${esc(e.name)}</b>${e.text?': ':''}`:''}${esc(e.text||'')}</li>`).join('');
+  let big='';
+  if(s.damage&&s.damage.length)big=`<div class="t-big">${s.damage.map((d,i)=>i?`<span>${esc(d)}</span>`:`<b>${esc(d)}</b>`).join('')}</div>`;
+  else if(s.ac)big=`<div class="t-big"><b>${esc(/^\d+$/.test(s.ac)&&/shield/i.test(s.type||'')?'+'+s.ac:s.ac)} Armour Class</b></div>`;
+  const effects=list(s.effects,'')+list(s.grants,'t-grant');
+  return `${x}<h4>${esc(s.name||name)}</h4>
+    <div class="t-sub">${s.rarity?`<span class="rar">${esc(s.rarity)}</span>`:''}${s.type?`<span>${esc(s.type)}</span>`:''}${s.enchant?`<span>${esc(s.enchant)}</span>`:''}</div>
+    ${big}
+    ${s.properties&&s.properties.length?`<div class="t-props">${s.properties.map(esc).join(' · ')}</div>`:''}
+    ${effects?`<ul>${effects}</ul>`:''}
+    ${s.description?`<p class="t-desc">${esc(s.description)}</p>`:''}
+    <div class="t-foot">${s.weight?`<span>${esc(s.weight)}</span>`:''}${s.price?`<span>${esc(s.price)}</span>`:''}${s.wiki?`<a href="${esc(s.wiki)}" target="_blank" rel="noopener">bg3.wiki</a>`:''}</div>`;
+}
+function placeTip(){
+  const el=TIP.el;if(!el||!TIP.anchor||el.classList.contains('sheetmode'))return;
+  if(!document.contains(TIP.anchor)){const n=TIP.anchor.dataset.tip;const f=[...document.querySelectorAll('[data-tip]')].find(x=>x.dataset.tip===n);if(!f){hideTip();return;}TIP.anchor=f;}
+  const a=TIP.anchor;
+  const r=a.getBoundingClientRect(),w=el.offsetWidth,h=el.offsetHeight,vw=innerWidth,vh=innerHeight,g=12;
+  let left=r.left,top=r.bottom+8;
+  if(left+w>vw-g)left=vw-g-w;if(left<g)left=g;
+  if(top+h>vh-g){top=r.top-8-h;if(top<g)top=Math.max(g,vh-g-h);}
+  el.style.left=left+'px';el.style.top=top+'px';
+}
+function showTip(anchor,pin){
+  clearTimeout(TIP.hideT);
+  const sheet=pin&&!canHover.matches;
+  if(!TIP.el){TIP.el=document.createElement('div');TIP.el.className='tip';TIP.el.setAttribute('role','dialog');document.body.appendChild(TIP.el);
+    TIP.el.addEventListener('mouseenter',()=>clearTimeout(TIP.hideT));TIP.el.addEventListener('mouseleave',()=>{if(!TIP.pinned)hideTipSoon();});}
+  const name=anchor.dataset.tip;const s=statsFor(name);
+  TIP.anchor=anchor;TIP.pinned=!!pin;
+  TIP.el.dataset.rarity=(s&&s.rarity)||'';TIP.el.setAttribute('aria-label',name);
+  TIP.el.innerHTML=tipHTML(name);
+  TIP.el.classList.toggle('sheetmode',sheet);
+  if(sheet&&!TIP.scrim){TIP.scrim=document.createElement('div');TIP.scrim.className='tip-scrim';TIP.scrim.addEventListener('click',hideTip);document.body.insertBefore(TIP.scrim,TIP.el);}
+  if(!sheet&&TIP.scrim){TIP.scrim.remove();TIP.scrim=null;}
+  TIP.el.hidden=false;TIP.el.scrollTop=0;placeTip();
+  if(pin)TIP.el.querySelector('.t-x').focus({preventScroll:true});
+}
+function hideTip(){
+  clearTimeout(TIP.hideT);if(!TIP.el||TIP.el.hidden)return;
+  const back=TIP.pinned&&TIP.anchor&&document.contains(TIP.anchor)?TIP.anchor:null;
+  TIP.el.hidden=true;TIP.pinned=false;TIP.anchor=null;if(TIP.scrim){TIP.scrim.remove();TIP.scrim=null;}
+  if(back)back.focus({preventScroll:true});
+}
+function hideTipSoon(){clearTimeout(TIP.hideT);TIP.hideT=setTimeout(hideTip,180);}
+document.addEventListener('mouseover',e=>{
+  if(!canHover.matches||TIP.pinned)return;const a=e.target.closest('[data-tip]');
+  if(a&&a!==TIP.anchor)showTip(a,false);else if(a)clearTimeout(TIP.hideT);
+});
+document.addEventListener('mouseout',e=>{
+  if(TIP.pinned)return;const a=e.target.closest('[data-tip]');
+  if(a&&!a.contains(e.relatedTarget))hideTipSoon();
+});
+document.addEventListener('click',e=>{
+  const a=e.target.closest('[data-tip]');
+  if(a){e.stopPropagation();if(TIP.pinned&&TIP.anchor===a)hideTip();else showTip(a,true);return;}
+  if(e.target.closest('[data-tipclose]')){hideTip();return;}
+  if(TIP.pinned&&TIP.el&&!TIP.el.contains(e.target))hideTip();
+},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&TIP.el&&!TIP.el.hidden)hideTip();});
+addEventListener('resize',placeTip);
+addEventListener('scroll',()=>{if(TIP.pinned)placeTip();else if(TIP.el&&!TIP.el.hidden)hideTip();},{passive:true});
+
 /* ---------- routing ---------- */
 function route(){const h=(location.hash||'').slice(1);return h||'party';}
 function go(r){if(location.hash.slice(1)!==r){location.hash=r;}else render();window.scrollTo(0,0);}
@@ -302,7 +412,7 @@ function pageParty(){
         <input id="pl-${k}" data-player="${k}" value="${esc(pname)}" placeholder="Who's playing?" ${writable()?'':'disabled'} autocomplete="off"></div>
       <div class="toolbar"><a class="tab" href="#${CH[k].slug}">Gear</a><a class="tab" href="#${CH[k].slug}-build">Build</a></div>
     </article>`;}).join('');
-  const split=SPLIT.map(([it,k,t])=>`<tr><td>${esc(it)}</td><td>${chip(k)}</td><td>${esc(t)}</td></tr>`).join('');
+  const split=SPLIT.map(([it,k,t])=>`<tr><td>${statsFor(it)?tipBtn(it):esc(it)}</td><td>${chip(k)}</td><td>${esc(t)}</td></tr>`).join('');
   return `<section class="page">
     <div class="head"><div class="eyebrow">Baldur's Gate 3 · Honour Mode · 4-player co-op</div><h1>The Party</h1>
       <p class="muted">Four builds, the guides they come from, and who gets which gear. Each character's gear list is shared: tick items off as you get them, or add, edit and remove items, and everyone sees it.</p></div>
@@ -331,7 +441,7 @@ function itemRow(it,{showWho,showWhere}){
   return `<div class="item ${it.got?'got':''}" style="${cvar(it.who)}">
     <div class="check"><input type="checkbox" id="got-${esc(it.id)}" data-got="${esc(it.id)}" ${it.got?'checked':''} ${w?'':'disabled'} aria-label="Got ${esc(it.name)}"></div>
     <div class="main">
-      <div class="line1"><label class="name" for="got-${esc(it.id)}">${esc(it.name)}</label><span class="slot">${esc(it.slot)}</span>${it.optional?'<span class="opt">optional</span>':''}${showWho?chip(it.who):''}</div>
+      <div class="line1">${tipBtn(it.name)}<span class="slot">${esc(it.slot)}</span>${it.optional?'<span class="opt">optional</span>':''}${showWho?chip(it.who):''}</div>
       ${showWhere&&st?`<div class="where">${esc(st.name)}</div>`:''}
       ${it.how?`<div class="how">${esc(it.how)}</div>`:''}
     </div>
@@ -590,6 +700,7 @@ document.addEventListener('input',e=>{
 
 /* ---------- boot ---------- */
 render();
+fetch('item-stats.json').then(r=>r.ok?r.json():{}).then(d=>{STATS={};for(const s of Object.values(d))STATS[normName(s.name)]=s;render();}).catch(()=>{});
 S.pass=loadPass();
 try{S.editing=!!S.pass&&localStorage.getItem(EDIT_KEY)!=='0';}catch(e){}
 const MAP={
