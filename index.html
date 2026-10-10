@@ -131,7 +131,16 @@ ul.list b,.kv b,.tbl b{color:var(--ink)}
 /* gear */
 .chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--c);border:1px solid var(--c);border-radius:999px;padding:2px 8px;white-space:nowrap}
 .slot{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.opt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--line);border-radius:4px;padding:1px 5px}
+.prio{font-family:var(--f-mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:1px 6px;white-space:nowrap}
+.prio.essential{background:var(--c,var(--accent));color:var(--surface);border:1px solid var(--c,var(--accent))}
+.prio.nice{color:var(--muted);border:1px dashed var(--muted)}
+.prio-set{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px}
+.prio-set .lbl{font-size:13px;color:var(--muted)}
+.prio-set .ibtn{min-height:32px;font-size:12.5px}
+.prio-set .ibtn[aria-pressed="true"]{background:var(--c,var(--accent));border-color:var(--c,var(--accent));color:var(--surface)}
+.prio-set .ibtn.nice[aria-pressed="true"]{background:var(--sunk);border:1px dashed var(--ink);color:var(--ink)}
+.legend{margin-top:6px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:14px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
 .act{display:flex;flex-direction:column;gap:12px}
 .act-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
 .act-h p{font-size:14px;color:var(--muted)}
@@ -435,15 +444,22 @@ function pageParty(){
     </div></section>`;
 }
 
+const PRIO={essential:'Essential',nice:'Nice to have'};
+const prioTag=it=>PRIO[it.priority]?`<span class="prio ${it.priority}">${PRIO[it.priority]}</span>`:'';
+// Edit mode: two toggles per item. Pressing the active one clears the label.
+const prioSet=it=>`<div class="prio-set" role="group" aria-label="Priority for ${esc(it.name)}"><span class="lbl">Mark as</span>${Object.entries(PRIO).map(([v,l])=>`<button class="ibtn ${v}" data-prio="${esc(it.id)}" data-val="${v}" aria-pressed="${it.priority===v}">${l}</button>`).join('')}</div>`;
+const prioLegend=()=>`<div class="legend"><span><span class="prio essential">Essential</span> core to the build</span><span><span class="prio nice">Nice to have</span> good, but skippable</span></div>`;
+
 function itemRow(it,{showWho,showWhere}){
   const st=stopById(it.stopId);const w=writable();
   const del=S.confirmDel===it.id;
   return `<div class="item ${it.got?'got':''}" style="${cvar(it.who)}">
     <div class="check"><input type="checkbox" id="got-${esc(it.id)}" data-got="${esc(it.id)}" ${it.got?'checked':''} ${w?'':'disabled'} aria-label="Got ${esc(it.name)}"></div>
     <div class="main">
-      <div class="line1">${tipBtn(it.name)}<span class="slot">${esc(it.slot)}</span>${it.optional?'<span class="opt">optional</span>':''}${showWho?chip(it.who):''}</div>
+      <div class="line1">${tipBtn(it.name)}<span class="slot">${esc(it.slot)}</span>${prioTag(it)}${showWho?chip(it.who):''}</div>
       ${showWhere&&st?`<div class="where">${esc(st.name)}</div>`:''}
       ${it.how?`<div class="how">${esc(it.how)}</div>`:''}
+      ${w?prioSet(it):''}
     </div>
     ${w?`<div class="acts">${del?`<span class="confirm">Remove it? <button class="ibtn danger" data-delyes="${esc(it.id)}">Remove</button><button class="ibtn" data-delno>Keep</button></span>`:`<button class="ibtn" data-edit="${esc(it.id)}">Edit</button><button class="ibtn" data-del="${esc(it.id)}" aria-label="Remove ${esc(it.name)}">Remove</button>`}</div>`:''}
   </div>`;
@@ -451,6 +467,7 @@ function itemRow(it,{showWho,showWhere}){
 
 function pageGear(k){
   const b=BUILD[k];const mine=itemsFor(i=>i.who===k);const got=mine.filter(i=>i.got).length;
+  const ess=mine.filter(i=>i.priority==='essential');const essGot=ess.filter(i=>i.got).length;
   let body='';
   for(const a of [1,2,3]){
     const list=mine.filter(i=>(stopById(i.stopId)?.act||3)===a);
@@ -460,7 +477,8 @@ function pageGear(k){
   if(!body)body=`<div class="empty">No gear on ${esc(CH[k].name)}'s list yet. ${writable()?'Use <b>Add item</b> to add the first one.':''}</div>`;
   return `<section class="page" style="${cvar(k)}">
     <div class="head"><div class="eyebrow">${esc(CH[k].name)}${S.players[k]?' · '+esc(S.players[k]):''}</div><h1>Gear checklist</h1>
-      <p class="muted">In the order you'll reach it. Tick items off as you get them. ${S.loaded.items?`<b>${got} of ${mine.length}</b> collected.`:''}</p></div>
+      <p class="muted">In the order you'll reach it. Tick items off as you get them. ${S.loaded.items?`<b>${got} of ${mine.length}</b> collected${ess.length?`, including <b>${essGot} of ${ess.length}</b> essentials`:''}.`:''}</p>
+      ${prioLegend()}</div>
     ${subtabs(k,'gear')}
     ${accessNote()}
     ${writable()?`<div class="toolbar"><button class="btn" data-add="${k}">Add item</button></div>`:''}
@@ -509,7 +527,8 @@ function pageRoute(){
   }
   return `<section class="page">
     <div class="head"><div class="eyebrow">Whole party</div><h1>Gear route</h1>
-      <p class="muted">Every item on everyone's list, grouped by where you get it, in route order. Add an item on your own gear page and it shows up here under its location.</p></div>
+      <p class="muted">Every item on everyone's list, grouped by where you get it, in route order. Add an item on your own gear page and it shows up here under its location.</p>
+      ${prioLegend()}</div>
     ${accessNote()}
     ${w?`<div class="toolbar"><button class="btn ghost" data-editmode>${S.arrange?'Done arranging':'Arrange locations'}</button>${S.arrange?'<span class="small muted">Move locations up or down to match the order you play them. Empty locations show while arranging.</span>':''}</div>`:''}
     ${loadingOr(body)}
@@ -596,7 +615,7 @@ function stopOptions(sel){
   return o+`<option value="__new">New location…</option>`;
 }
 function openSheet({item,who}){
-  const it=item||{who,name:'',slot:'Head',stopId:sortedStops()[0]?.id||'__new',how:'',optional:false};
+  const it=item||{who,name:'',slot:'Head',stopId:sortedStops()[0]?.id||'__new',how:'',priority:null};
   const names=[...new Set(S.items.map(i=>i.name))].sort();
   const host=document.getElementById('sheetHost');
   host.innerHTML=`<div class="scrim" id="scrim"><form class="sheet" id="itemForm" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" novalidate>
@@ -613,7 +632,7 @@ function openSheet({item,who}){
       <div class="field"><label for="f-stopact">Act</label><select id="f-stopact"><option value="1">Act 1</option><option value="2">Act 2</option><option value="3">Act 3</option></select></div>
     </div>
     <div class="field"><label for="f-how">How to get it <span class="muted">(optional)</span></label><textarea id="f-how" placeholder="e.g. Buy from Grat, or loot from the chest by the door">${esc(it.how)}</textarea></div>
-    <label class="inline"><input type="checkbox" id="f-opt" ${it.optional?'checked':''}> Nice to have, not essential</label>
+    <div class="field"><label for="f-prio">Priority</label><select id="f-prio"><option value="" ${it.priority?'':'selected'}>Not set</option>${Object.entries(PRIO).map(([v,l])=>`<option value="${v}" ${it.priority===v?'selected':''}>${l}</option>`).join('')}</select></div>
     <div class="err" id="f-err" hidden></div>
     <div class="toolbar"><button class="btn" type="submit" id="f-save">${item?'Save changes':'Add to list'}</button><button class="btn ghost" type="button" id="f-cancel">Cancel</button></div>
   </form></div>`;
@@ -641,8 +660,8 @@ function openSheet({item,who}){
         if(!sn){err.textContent='Name the new location, or pick one from the list.';err.hidden=false;$('f-save').disabled=false;return;}
         stopId=await write('add_stop',{p_name:sn,p_act:act},'stops');
       }
-      const data={who:$('f-who').value,name,slot:$('f-slot').value,stopId,how:$('f-how').value.trim(),optional:$('f-opt').checked};
-      await write('save_item',{p_id:item?item.id:null,p_who:data.who,p_name:data.name,p_slot:data.slot,p_stop_id:data.stopId,p_how:data.how,p_optional:data.optional},'items');
+      const data={who:$('f-who').value,name,slot:$('f-slot').value,stopId,how:$('f-how').value.trim(),priority:$('f-prio').value||null};
+      await write('save_item',{p_id:item?item.id:null,p_who:data.who,p_name:data.name,p_slot:data.slot,p_stop_id:data.stopId,p_how:data.how,p_priority:data.priority},'items');
       toast(item?'Saved':`Added to ${CH[data.who].name}'s list`);
       close();
     }catch(ex){$('f-save').disabled=false;fail(ex);}
@@ -657,6 +676,12 @@ document.addEventListener('click',async e=>{
   if(d.mode==='view'){setEditing(false);toast('Back to view only');return;}
   if(d.add){openSheet({who:d.add});return;}
   if(d.edit){const it=S.items.find(i=>i.id===d.edit);if(it)openSheet({item:it});return;}
+  if(d.prio){
+    const it=S.items.find(i=>i.id===d.prio);if(!it)return;
+    const prev=it.priority;const next=prev===d.val?null:d.val;it.priority=next;render();
+    try{await write('set_item_priority',{p_id:it.id,p_priority:next},'items');}catch(ex){it.priority=prev;render();fail(ex);}
+    return;
+  }
   if(d.del){S.confirmDel=d.del;render();return;}
   if('delno' in d){S.confirmDel=null;render();return;}
   if(d.delyes){S.confirmDel=null;render();try{await write('remove_item',{p_id:d.delyes},'items');toast('Removed');}catch(ex){fail(ex);}return;}
@@ -705,7 +730,7 @@ S.pass=loadPass();
 try{S.editing=!!S.pass&&localStorage.getItem(EDIT_KEY)!=='0';}catch(e){}
 const MAP={
   stops:r=>({id:r.id,name:r.name,detail:r.detail||'',act:r.act,order:r.sort_order}),
-  items:r=>({id:r.id,who:String(r.who).trim(),name:r.name,slot:r.slot,stopId:r.stop_id,how:r.how||'',optional:r.optional,got:r.got,created:r.created})};
+  items:r=>({id:r.id,who:String(r.who).trim(),name:r.name,slot:r.slot,stopId:r.stop_id,how:r.how||'',priority:r.priority||null,got:r.got,created:r.created})};
 async function loadTable(t){
   const {data,error}=await S.db.from(t).select('*');
   if(error){if(!S.loaded.items||!S.loaded.stops){S.status='offline';render();}return;}
