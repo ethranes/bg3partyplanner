@@ -50,7 +50,26 @@ p{margin:0;max-width:68ch}
 .status{margin-left:auto;font-family:var(--f-mono);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .status .pip{width:8px;height:8px;border-radius:50%;background:var(--muted)}
 .status.live .pip{background:var(--druid)}
-@media (max-width:640px){.status{margin-left:0;width:100%}}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.live-m{display:none}
+@media (max-width:640px){
+  .status{margin-left:0;width:100%}
+  /* phones: one scrolling row of tabs, and the live status folds into the mode strip */
+  .bar-in{padding-block:8px;padding-inline:0}
+  .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-inline:16px;width:100%;scroll-padding-inline:16px;
+    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 12px,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(to right,transparent 0,#000 12px,#000 calc(100% - 24px),transparent)}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{min-height:36px;padding:0 12px;font-size:14px;white-space:nowrap;flex-shrink:0}
+  .status{padding-inline:16px}
+  .status.live{display:none}
+  .modebar-in{flex-wrap:nowrap;padding-block:6px;gap:10px}
+  .modebar .mode{font-size:14px;min-width:0}
+  .modebar .desc{display:none}
+  .modebar .live-m{display:flex;align-items:center;gap:6px;margin-left:auto;font-family:var(--f-mono);font-size:12px;opacity:.8}
+  .modebar .live-m .pip{width:8px;height:8px;border-radius:50%;background:currentColor}
+  .modebar[data-mode="view"] .live-m .pip{background:var(--druid)}
+  .modebar .btn{min-height:34px;padding:0 14px;font-size:14px;flex-shrink:0}
+}
 /* view / edit mode strip, part of the sticky bar so it is always visible */
 .modebar{border-top:1px solid var(--line);background:var(--sunk)}
 .modebar[data-mode="edit"]{background:var(--accent);color:var(--accent-ink);border-top-color:var(--accent)}
@@ -240,7 +259,11 @@ function renderNav(){
     :S.status==='offline'?'<span class="status"><span class="pip"></span>Gear lists unavailable</span>'
     :'<span class="status"><span class="pip"></span>Connecting…</span>';
   renderModebar();
-  document.getElementById('nav').innerHTML=tabs.map(([id,l,k])=>`<a class="tab" href="#${id}" ${base===id?'aria-current="page"':''} ${k?`style="${cvar(k)}"`:''}>${k?'<span class="dot"></span>':''}${esc(l)}</a>`).join('')+st;
+  const nav=document.getElementById('nav');
+  nav.innerHTML='<div class="tabs" id="tabs">'+tabs.map(([id,l,k])=>`<a class="tab" href="#${id}" ${base===id?'aria-current="page"':''} ${k?`style="${cvar(k)}"`:''}>${k?'<span class="dot"></span>':''}${esc(l)}</a>`).join('')+'</div>'+st;
+  // on phones the tabs are one scrolling row: keep the current tab in view
+  const row=document.getElementById('tabs'),cur=row.querySelector('[aria-current]');
+  if(cur&&row.scrollWidth>row.clientWidth)row.scrollLeft=cur.offsetLeft-(row.clientWidth-cur.offsetWidth)/2;
 }
 
 const ICON_EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -250,8 +273,8 @@ function renderModebar(){
   if(!S.db||S.status!=='live'){el.hidden=true;return;}
   el.hidden=false;el.dataset.mode=S.editing?'edit':'view';
   el.innerHTML=S.editing
-    ?`<div class="modebar-in"><span class="mode">${ICON_PEN}<span><b>Edit mode</b> · Changes save for everyone.</span></span><button class="btn" data-mode="view">Done editing</button></div>`
-    :`<div class="modebar-in"><span class="mode">${ICON_EYE}<span><b>View only</b> · Ticking and editing are locked.</span></span><button class="btn" data-mode="edit">Edit mode</button></div>`;
+    ?`<div class="modebar-in"><span class="mode">${ICON_PEN}<span><b>Edit mode</b><span class="desc"> · Changes save for everyone.</span></span></span><span class="live-m"><span class="pip"></span>Live</span><button class="btn" data-mode="view">Done<span class="desc"> editing</span></button></div>`
+    :`<div class="modebar-in"><span class="mode">${ICON_EYE}<span><b>View only</b><span class="desc"> · Ticking and editing are locked.</span></span></span><span class="live-m"><span class="pip"></span>Live</span><button class="btn" data-mode="edit">Edit mode</button></div>`;
 }
 
 /* ---------- pages ---------- */
