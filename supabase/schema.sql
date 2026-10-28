@@ -180,3 +180,32 @@ revoke execute on function public.save_item(text, text, text, text, text, text, 
   public.set_item_priority(text, text, text) from public;
 grant execute on function public.save_item(text, text, text, text, text, text, text, text),
   public.set_item_priority(text, text, text) to anon, authenticated;
+
+-- Fight order checklist (added 2026-10-19): one row per ticked fight on the Fight order page, keyed by the fight's id in index.html.
+
+create table if not exists public.fights (
+  id         text primary key check (char_length(id) between 1 and 80),
+  done       boolean not null default false,
+  updated_at timestamptz not null default now()
+);
+alter table public.fights enable row level security;
+do $$ begin
+  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'fights') then
+    create policy "anyone can read fights" on public.fights for select to anon, authenticated using (true);
+  end if;
+end $$;
+revoke insert, update, delete, truncate on public.fights from anon, authenticated;
+
+do $$ begin
+  alter publication supabase_realtime add table public.fights;
+exception when duplicate_object then null; end $$;
+
+create or replace function public.set_fight_done(p_passcode text, p_id text, p_done boolean) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  perform private.require_passcode(p_passcode);
+  insert into public.fights (id, done, updated_at) values (p_id, coalesce(p_done, false), now())
+  on conflict (id) do update set done = excluded.done, updated_at = now();
+end $$;
+revoke execute on function public.set_fight_done(text, text, boolean) from public;
+grant execute on function public.set_fight_done(text, text, boolean) to anon, authenticated;

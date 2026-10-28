@@ -135,7 +135,9 @@ ul.list b,.kv b,.tbl b{color:var(--ink)}
 ol.fights{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .fight{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:12px 16px;border-top:1px solid var(--line)}
 .fight:first-child{border-top:0}
-.f-n{font-family:var(--f-mono);font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:2px}
+.f-n{font-family:var(--f-mono);font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:2px;display:flex;align-items:flex-start;gap:10px}
+.fight:has(input){grid-template-columns:64px 1fr}
+.fight.done .f-t b{text-decoration:line-through;text-decoration-thickness:2px;color:var(--muted)}
 .f-b{display:flex;flex-direction:column;gap:4px;min-width:0}
 .f-t{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:16px}
 .fight .how{font-size:14.5px;color:var(--muted)}
@@ -290,7 +292,7 @@ C:{role:'Healing, buffs, control',line:'Storm Sorcerer 1 / Light Domain Cleric 1
 const SPLIT=[['Boots of Stormy Clamour','C','Sorcerer wears Disintegrating Night Walkers instead.'],['Hood of the Weave','S','Cleric keeps the Holy Lance Helm; it feeds the Reverberation combo.'],['Cloak of the Weave','S','Cleric wears the Thunderskin Cloak.'],["Ketheric's Shield",'S',"Cleric uses the Sentinel Shield, then Viconia's Walking Fortress."],['Cloak of Displacement','A',"The Assassin's old Cloak of Protection goes to whoever has no cloak yet."],['Ring of Protection','D',"The tank gets the AC. Sorcerer takes Crusher's Ring."],['Bow of Awareness','C','Sorcerer gets initiative from the Alert feat instead.'],['Callous Glow Ring','C',"Core to the Cleric's radiant combo."],['Adamantine Forge','D','Two crafts: a Scimitar for the Druid and a Shield for the Cleric.'],['Mirror of Loss (+2 stat)','S','Both caster guides want it (CHA for the Sorcerer, WIS for the Cleric). Decide before you get there.']];
 
 /* ---------- state ---------- */
-const S={stops:[],items:[],players:{},db:null,status:'connecting',loaded:{stops:false,items:false},editing:false,arrange:false,confirmDel:null,pass:null};
+const S={stops:[],items:[],players:{},fights:{},db:null,status:'connecting',loaded:{stops:false,items:false},editing:false,arrange:false,confirmDel:null,pass:null};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cvar=k=>`--c:var(${CH[k].v})`;
 const chip=k=>`<span class="chip" style="${cvar(k)}"><span class="dot"></span>${esc(CH[k].name)}</span>`;
@@ -558,52 +560,52 @@ const FSRC={
 };
 const FIGHTS=[
   {stage:'Nautiloid',lvl:'1',note:'The tutorial. Everything else waits until you land.',list:[
-    ['Imps with Lae\'zel','First fight, easy.',null,['TA','BG']],
-    ['Commander Zhalk','Optional. You can ignore him and use the transponder.',null,['TA','BG'],'opt']]},
+    ['imps-with-laezel','Imps with Lae\'zel','First fight, easy.',null,['TA','BG']],
+    ['commander-zhalk','Commander Zhalk','Optional. You can ignore him and use the transponder.',null,['TA','BG'],'opt']]},
   {stage:'Beach, Overgrown Ruins and the Grove',lvl:'1 to 2',note:'Be level 2 before the Intellect Devourers.',list:[
-    ['Intellect Devourers by the crash','Not with only two of you. Full party at level 2, open from hiding.','2',['TA']],
-    ['Bandits in the Overgrown Ruins','Block the door with a desk and set off the oil barrel.',null,['TA']],
-    ['Undead in the ruins crypt','Hide in the corners before you press the button.',null,['TA']],
-    ['Goblin raid at the Grove gate','Kill the Bugbear first.',null,['TA','BG']],
-    ['Bugbear Assassin going for Nadira','Ambush it from turn-based mode.',null,['TA']],
-    ['Goblins in the cavern past Sazza','Three defence statues join in if you\'re careless. Last fight before the long rest.',null,['TA']]]},
+    ['intellect-devourers-by-the-crash','Intellect Devourers by the crash','Not with only two of you. Full party at level 2, open from hiding.','2',['TA']],
+    ['bandits-in-the-overgrown-ruins','Bandits in the Overgrown Ruins','Block the door with a desk and set off the oil barrel.',null,['TA']],
+    ['undead-in-the-ruins-crypt','Undead in the ruins crypt','Hide in the corners before you press the button.',null,['TA']],
+    ['goblin-raid-at-the-grove-gate','Goblin raid at the Grove gate','Kill the Bugbear first.',null,['TA','BG']],
+    ['bugbear-assassin-going-for-nadira','Bugbear Assassin going for Nadira','Ambush it from turn-based mode.',null,['TA']],
+    ['goblins-in-the-cavern-past-sazza','Goblins in the cavern past Sazza','Three defence statues join in if you\'re careless. Last fight before the long rest.',null,['TA']]]},
   {stage:'Blighted Village and the Risen Road',lvl:'2 to 4',note:'Hold off levelling at 3 so the vendors restock. Be level 4, or nearly, by the end of this stage.',list:[
-    ['Goblins at the Blighted Village gate','Talking can avoid it. If not, watch the rooftops.',null,['TA','BG']],
-    ['Sleeping Bugbear, and the Bugbear and Ogre in the barn','Lump\'s War Horn (from the Ogres at the windmill) helps a lot here and later.',null,['TA']],
-    ['Paladins of Tyr at the Risen Road toll house','Or side with them against Karlach. Kill Cyrel\'s group carefully, they cast Hold Person.',null,['TA','BG']],
-    ['Harpies on the beach','Too dicey at 2 or 3. Wait until you\'re topped up at level 4.','4',['TA']]]},
+    ['goblins-at-the-blighted-village-gate','Goblins at the Blighted Village gate','Talking can avoid it. If not, watch the rooftops.',null,['TA','BG']],
+    ['sleeping-bugbear-and-the-bugbear-and-ogr','Sleeping Bugbear, and the Bugbear and Ogre in the barn','Lump\'s War Horn (from the Ogres at the windmill) helps a lot here and later.',null,['TA']],
+    ['paladins-of-tyr-at-the-risen-road-toll-h','Paladins of Tyr at the Risen Road toll house','Or side with them against Karlach. Kill Cyrel\'s group carefully, they cast Hold Person.',null,['TA','BG']],
+    ['harpies-on-the-beach','Harpies on the beach','Too dicey at 2 or 3. Wait until you\'re topped up at level 4.','4',['TA']]]},
   {stage:'Waukeen\'s Rest, Owlbear and the Swamp',lvl:'4',note:'The biggest stage in Act 1. Short rest between the big fights.',list:[
-    ['Gnoll scouts and Bloated Hyenas','East path out of Waukeen\'s Rest. Deal with the hyena corpses in one turn, they explode.',null,['TA','BG']],
-    ['Gnoll war party and Flind','North along the same path. Use the spider egg sac and set up an ambush first.',null,['TA']],
-    ['Rugan and Olly','Zhentarim hideout, only if you go hostile. Mind the explosive barrels.',null,['TA'],'opt'],
-    ['Owlbear and its mate','Its legendary action calls a second Owlbear. Kill both around the same time so neither enrages.','4',['TA','DG']],
-    ['Phase Spider Matriarch','Under the Blighted Village well. Break her three egg sacs before the fight.','4',['DG','BG']],
-    ['Red Caps in the swamp','South past the bridge. Kill them first if you saw through the illusion.',null,['TA']],
-    ['Wood Woads and Mud Mephits','On the island off the dock. Mephits first, fire on the vines.',null,['TA']],
-    ['Auntie Ethel','Arcane Lock the stairs so you only fight her once. Drop her to about 30 HP for the permanent bonus.','4 to 5',['TA','DG']],
-    ['Shadow Druids and Kagha','In the Grove. Make sure Kagha dies in the fight.',null,['TA']]]},
+    ['gnoll-scouts-and-bloated-hyenas','Gnoll scouts and Bloated Hyenas','East path out of Waukeen\'s Rest. Deal with the hyena corpses in one turn, they explode.',null,['TA','BG']],
+    ['gnoll-war-party-and-flind','Gnoll war party and Flind','North along the same path. Use the spider egg sac and set up an ambush first.',null,['TA']],
+    ['rugan-and-olly','Rugan and Olly','Zhentarim hideout, only if you go hostile. Mind the explosive barrels.',null,['TA'],'opt'],
+    ['owlbear-and-its-mate','Owlbear and its mate','Its legendary action calls a second Owlbear. Kill both around the same time so neither enrages.','4',['TA','DG']],
+    ['phase-spider-matriarch','Phase Spider Matriarch','Under the Blighted Village well. Break her three egg sacs before the fight.','4',['DG','BG']],
+    ['red-caps-in-the-swamp','Red Caps in the swamp','South past the bridge. Kill them first if you saw through the illusion.',null,['TA']],
+    ['wood-woads-and-mud-mephits','Wood Woads and Mud Mephits','On the island off the dock. Mephits first, fire on the vines.',null,['TA']],
+    ['auntie-ethel','Auntie Ethel','Arcane Lock the stairs so you only fight her once. Drop her to about 30 HP for the permanent bonus.','4 to 5',['TA','DG']],
+    ['shadow-druids-and-kagha','Shadow Druids and Kagha','In the Grove. Make sure Kagha dies in the fight.',null,['TA']]]},
   {stage:'Goblin Camp',lvl:'4 to 5',note:'Finish trading and free Halsin before you start on the leaders. Be level 5 on everyone after this.',list:[
-    ['Camp outside','About 20 goblins, 3 Bugbears and an Ogre. Blow Lump\'s War Horn and fight from the ledges.',null,['TA']],
-    ['Jail guards and Wargs (Halsin)','Hold the top of the stairs.',null,['TA']],
-    ['Priestess Gut','You can talk your way out of it.',null,['TA','BG']],
-    ['Minthara','Use non-lethal damage if you want to recruit her later.',null,['TA','BG']],
-    ['Dror Ragzlin','The hardest Act 1 fight per bg3guides. The rest of the camp turns hostile, so don\'t go back to the lobby.','5',['TA','DG','BG']]]},
+    ['camp-outside','Camp outside','About 20 goblins, 3 Bugbears and an Ogre. Blow Lump\'s War Horn and fight from the ledges.',null,['TA']],
+    ['jail-guards-and-wargs-halsin','Jail guards and Wargs (Halsin)','Hold the top of the stairs.',null,['TA']],
+    ['priestess-gut','Priestess Gut','You can talk your way out of it.',null,['TA','BG']],
+    ['minthara','Minthara','Use non-lethal damage if you want to recruit her later.',null,['TA','BG']],
+    ['dror-ragzlin','Dror Ragzlin','The hardest Act 1 fight per bg3guides. The rest of the camp turns hostile, so don\'t go back to the lobby.','5',['TA','DG','BG']]]},
   {stage:'Underdark',lvl:'5',note:'Don\'t come down here before level 5.',list:[
-    ['BOOOAL and the Kua-toa','Dialogue can cut it down to just the Red Cap.',null,['TA']],
-    ['Bulette','Tanky, little reward. Only at level 5 or higher (Extra Attack, 3rd-level spells).','5+',['TA','DG']],
-    ['Minotaur by the Selûnite Outpost','Use the outpost turrets.',null,['TA']],
-    ['Hook Horrors and the Drow','Ambush them. Clear the one on the tree roots too.',null,['TA']],
-    ['Duergar ambush (Gekh Coal)','Focus Gekh first so he can\'t go invisible.',null,['TA']],
-    ['Sovereign Glut','Optional, easy XP.',null,['TA'],'opt'],
-    ['Bernard at the Arcane Tower','No reason to fight. Read the book in the tower and talk your way past.',null,['DG'],'opt']]},
+    ['boooal-and-the-kua-toa','BOOOAL and the Kua-toa','Dialogue can cut it down to just the Red Cap.',null,['TA']],
+    ['bulette','Bulette','Tanky, little reward. Only at level 5 or higher (Extra Attack, 3rd-level spells).','5+',['TA','DG']],
+    ['minotaur-by-the-selunite-outpost','Minotaur by the Selûnite Outpost','Use the outpost turrets.',null,['TA']],
+    ['hook-horrors-and-the-drow','Hook Horrors and the Drow','Ambush them. Clear the one on the tree roots too.',null,['TA']],
+    ['duergar-ambush-gekh-coal','Duergar ambush (Gekh Coal)','Focus Gekh first so he can\'t go invisible.',null,['TA']],
+    ['sovereign-glut','Sovereign Glut','Optional, easy XP.',null,['TA'],'opt'],
+    ['bernard-at-the-arcane-tower','Bernard at the Arcane Tower','No reason to fight. Read the book in the tower and talk your way past.',null,['DG'],'opt']]},
   {stage:'Grymforge',lvl:'5 to 6',note:'Short rest before the forge and again before Grym.',list:[
-    ['Duergar on the pier','Talk them into leaving.',null,['TA'],'opt'],
-    ['Mimics','Attack from the ledge. Keep away from the edge.',null,['TA']],
-    ['Nere and the duergar camp','Kill the Mind Masters first. Nere\'s Psionic Visage explodes on melee, so spread out.','5',['TA','DG']],
-    ['Animated Armours and Magma Mephits','At the forge.',null,['TA']],
-    ['Grym','A level 8 boss. Start the forge and drop him in the lava to remove his immunity.','6',['TA','DG','BG']]]},
+    ['duergar-on-the-pier','Duergar on the pier','Talk them into leaving.',null,['TA'],'opt'],
+    ['mimics','Mimics','Attack from the ledge. Keep away from the edge.',null,['TA']],
+    ['nere-and-the-duergar-camp','Nere and the duergar camp','Kill the Mind Masters first. Nere\'s Psionic Visage explodes on melee, so spread out.','5',['TA','DG']],
+    ['animated-armours-and-magma-mephits','Animated Armours and Magma Mephits','At the forge.',null,['TA']],
+    ['grym','Grym','A level 8 boss. Start the forge and drop him in the lava to remove his immunity.','6',['TA','DG','BG']]]},
   {stage:'Mountain Pass and Rosymorn',lvl:'6',note:'Last stop before Act 2. Everything above locks once you leave.',list:[
-    ['Inquisitor W\'wargaz','Githyanki Crèche boss, level 6.','6',['DG'],'opt']]}
+    ['inquisitor-wwargaz','Inquisitor W\'wargaz','Githyanki Crèche boss, level 6.','6',['DG'],'opt']]}
 ];
 const FDISAGREE=[
   ['Auntie Ethel','TrueAchievements fights her at about level 4, before the Goblin Camp. Deltia\'s rates her a level 5 boss. If the Swamp fights felt hard, leave her until after the camp.'],
@@ -613,17 +615,20 @@ const FDISAGREE=[
   ['Commander Zhalk','TrueAchievements fights him for the XP; bg3guides says ignore him. It\'s optional either way.']
 ];
 function pageFights(){
+  const w=writable(),tickable=S.loaded.fights;
+  const all=FIGHTS.flatMap(s=>s.list.map(f=>f[0])),doneN=all.filter(id=>S.fights[id]).length;
   const tag=k=>`<a class="src" href="${FSRC[k].url}" target="_blank" rel="noopener" title="${esc(FSRC[k].name)}">${k}</a>`;
   let n=0;
-  const stages=FIGHTS.map((s,si)=>`<div class="act"><div class="act-h"><h2><span class="stage-n">${si+1}</span>${esc(s.stage)}</h2><span class="lvl">Party level ${esc(s.lvl)}</span></div>
+  const stages=FIGHTS.map((s,si)=>`<div class="act"><div class="act-h"><h2><span class="stage-n">${si+1}</span>${esc(s.stage)}</h2><span class="lvl">Party level ${esc(s.lvl)}</span>${tickable?`<span class="small muted">${s.list.filter(f=>S.fights[f[0]]).length} of ${s.list.length} done</span>`:''}</div>
     <p class="small muted">${esc(s.note)}</p>
-    <ol class="fights" start="${n+1}">${s.list.map(([name,how,lvl,src,opt])=>{n++;return `<li class="fight">
-      <div class="f-n">${n}</div>
+    <ol class="fights" start="${n+1}">${s.list.map(([id,name,how,lvl,src,opt])=>{n++;const done=!!S.fights[id];return `<li class="fight${done?' done':''}">
+      <div class="f-n">${tickable?`<input type="checkbox" data-fight="${id}" ${done?'checked':''} ${w?'':'disabled'} aria-label="Done: ${esc(name)}">`:''}<span>${n}</span></div>
       <div class="f-b"><div class="f-t"><b>${esc(name)}</b>${opt?'<span class="prio nice">Optional</span>':''}${lvl?`<span class="lvl">Lv ${esc(lvl)}</span>`:''}</div>
       <div class="how">${esc(how)}</div><div class="srcs">${src.map(tag).join('')}</div></div></li>`;}).join('')}</ol></div>`).join('');
   return `<section class="page">
     <div class="head"><div class="eyebrow">Whole party · Act 1</div><h1>Fight order</h1>
-      <p class="muted">The order to take on Act 1's fights so you're never there too early. It follows an Honour Mode walkthrough, with a suggested party level where the guides give one. It isn't a full walkthrough: just what to fight, roughly when, and one tip each.</p></div>
+      <p class="muted">The order to take on Act 1's fights so you're never there too early. It follows an Honour Mode walkthrough, with a suggested party level where the guides give one. It isn't a full walkthrough: just what to fight, roughly when, and one tip each.</p>
+      ${tickable?`<p class="muted">Tick fights off as you clear them. <b>${doneN} of ${all.length}</b> done.</p>`:''}</div>
     ${stages}
     <div class="grid2">
       <div class="box"><div class="eyebrow">Where the guides disagree</div><ul class="list">${FDISAGREE.map(([a,b])=>`<li><b>${esc(a)}.</b> ${esc(b)}</li>`).join('')}</ul></div>
@@ -812,6 +817,9 @@ document.addEventListener('change',async e=>{
   if(t.dataset&&t.dataset.got){const id=t.dataset.got;const got=t.checked;
     const it=S.items.find(i=>i.id===id);if(it){it.got=got;render();}
     try{await write('set_item_got',{p_id:id,p_got:got},'items');}catch(ex){if(it){it.got=!got;render();}fail(ex);}}
+  if(t.dataset&&t.dataset.fight){const id=t.dataset.fight;const done=t.checked;
+    S.fights[id]=done;render();
+    try{await write('set_fight_done',{p_id:id,p_done:done},'fights');}catch(ex){S.fights[id]=!done;render();fail(ex);}}
 });
 let plT={};
 document.addEventListener('input',e=>{
@@ -832,13 +840,15 @@ const MAP={
   items:r=>({id:r.id,who:String(r.who).trim(),name:r.name,slot:r.slot,stopId:r.stop_id,how:r.how||'',priority:r.priority||null,got:r.got,created:r.created})};
 async function loadTable(t){
   const {data,error}=await S.db.from(t).select('*');
+  // the fight checklist is extra: if its table isn't there, the page just shows no tick boxes
+  if(t==='fights'){if(!error){S.fights={};for(const r of data)S.fights[r.id]=!!r.done;S.loaded.fights=true;render();}return;}
   if(error){if(!S.loaded.items||!S.loaded.stops){S.status='offline';render();}return;}
   if(t==='players'){S.players={};for(const r of data)S.players[String(r.who).trim()]=r.name||'';}
   else{S[t]=data.map(MAP[t]);S.loaded[t]=true;}
   if(S.status!=='live'&&S.loaded.items&&S.loaded.stops)S.status='live';
   render();
 }
-const loadAll=()=>Promise.all(['stops','items','players'].map(loadTable));
+const loadAll=()=>Promise.all(['stops','items','players','fights'].map(loadTable));
 (async()=>{
   if(!window.supabase){S.status='offline';render();return;}
   S.db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false}});
@@ -849,6 +859,8 @@ const loadAll=()=>Promise.all(['stops','items','players'].map(loadTable));
   let ch=S.db.channel('party');
   for(const t of ['stops','items','players'])ch=ch.on('postgres_changes',{event:'*',schema:'public',table:t},()=>reload(t));
   ch.subscribe();
+  // fights on a channel of its own, so a missing fights table can't break gear updates
+  S.db.channel('fights').on('postgres_changes',{event:'*',schema:'public',table:'fights'},()=>reload('fights')).subscribe();
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadAll();});
 })();
 </script>
