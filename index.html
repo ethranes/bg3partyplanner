@@ -127,6 +127,9 @@ ul.list b,.kv b,.tbl b{color:var(--ink)}
 .tbl td:nth-child(2){color:var(--ink);font-weight:700;white-space:nowrap}
 .tbl.plain td:first-child{font-family:var(--f-body);color:var(--ink);white-space:normal}
 .tbl.plain td:nth-child(2){font-weight:400;white-space:nowrap}
+.clash-warn{margin-top:4px;color:var(--danger);font-size:13px}
+.clash-tag{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--danger);border:1px dashed currentColor;border-radius:999px;padding:2px 8px}
+.clash-new td:nth-child(3) .chip{margin:0 2px}
 
 /* fight order */
 .act-h h2{display:flex;align-items:center;gap:10px}
@@ -423,6 +426,30 @@ function loadingOr(html){
   return html;
 }
 
+/* Contested gear: the agreed splits in SPLIT, plus any item that is on two or more characters'
+   live lists. A clash with no agreed split is flagged; so is an agreed split both players still list. */
+function liveClashes(){
+  const by=new Map();
+  for(const it of S.items){const n=normName(it.name);if(!n)continue;
+    if(!by.has(n))by.set(n,{name:it.name,who:new Set()});by.get(n).who.add(it.who);}
+  return [...by.values()].filter(c=>c.who.size>1);
+}
+const WHO_ORDER='SDAC';
+const whoList=set=>[...set].sort((a,b)=>WHO_ORDER.indexOf(a)-WHO_ORDER.indexOf(b));
+function clashRows(){
+  const clashes=S.loaded.items?liveClashes():[];
+  const byName=new Map(clashes.map(c=>[normName(c.name),c]));
+  const nameCell=n=>statsFor(n)?tipBtn(n):esc(n);
+  const rows=SPLIT.map(([it,k,t])=>{
+    const c=byName.get(normName(it));byName.delete(normName(it));
+    const others=c?whoList(c.who).filter(w=>w!==k):[];
+    const warn=others.length?`<div class="clash-warn">Still on ${others.map(w=>esc(CH[w].name)).join(' and ')}'s list too.</div>`:'';
+    return `<tr><td>${nameCell(it)}</td><td>${chip(k)}</td><td>${esc(t)}${warn}</td></tr>`;});
+  for(const c of byName.values())
+    rows.push(`<tr class="clash-new"><td>${nameCell(c.name)}</td><td><span class="clash-tag">Undecided</span></td><td>On the ${whoList(c.who).map(w=>chip(w)).join(' and ')} lists. Pick who takes it.</td></tr>`);
+  return rows.join('');
+}
+
 function pageParty(){
   const cards=ORDER.map(k=>{
     const b=BUILD[k];const mine=S.items.filter(i=>i.who===k);const got=mine.filter(i=>i.got).length;const pct=mine.length?Math.round(got/mine.length*100):0;
@@ -437,13 +464,14 @@ function pageParty(){
         <input id="pl-${k}" data-player="${k}" value="${esc(pname)}" placeholder="Who's playing?" ${writable()?'':'disabled'} autocomplete="off"></div>
       <div class="toolbar"><a class="tab" href="#${CH[k].slug}">Gear</a><a class="tab" href="#${CH[k].slug}-build">Build</a></div>
     </article>`;}).join('');
-  const split=SPLIT.map(([it,k,t])=>`<tr><td>${statsFor(it)?tipBtn(it):esc(it)}</td><td>${chip(k)}</td><td>${esc(t)}</td></tr>`).join('');
+  const split=clashRows();
   return `<section class="page">
     <div class="head"><div class="eyebrow">Baldur's Gate 3 · Honour Mode · 4-player co-op</div><h1>The Party</h1>
       <p class="muted">Four builds, the guides they come from, and who gets which gear. Each character's gear list is shared: tick items off as you get them, or add, edit and remove items, and everyone sees it.</p></div>
     ${accessNote()}
     <div class="cards">${cards}</div>
     <h2>Who gets the contested gear</h2>
+    <p class="muted">Checked against the live gear lists: anything that turns up on two characters' lists shows here on its own.</p>
     <div class="tblwrap"><table class="tbl plain"><thead><tr><th>Wanted by two of you</th><th>Goes to</th><th>The other one takes</th></tr></thead><tbody>${split}</tbody></table></div>
     <div class="grid2">
       <div class="box"><div class="eyebrow">Points of no return</div><ul class="list">
