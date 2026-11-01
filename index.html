@@ -127,7 +127,6 @@ ul.list b,.kv b,.tbl b{color:var(--ink)}
 .tbl td:nth-child(2){color:var(--ink);font-weight:700;white-space:nowrap}
 .tbl.plain td:first-child{font-family:var(--f-body);color:var(--ink);white-space:normal}
 .tbl.plain td:nth-child(2){font-weight:400;white-space:nowrap}
-.clash-warn{margin-top:4px;color:var(--danger);font-size:13px}
 .clash-tag{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--danger);border:1px dashed currentColor;border-radius:999px;padding:2px 8px}
 .clash-new td:nth-child(3) .chip{margin:0 2px}
 
@@ -427,7 +426,7 @@ function loadingOr(html){
 }
 
 /* Contested gear: the agreed splits in SPLIT, plus any item that is on two or more characters'
-   live lists (spelling variants are matched through the aliases in item-stats.json). A clash with no agreed split is flagged; so is an agreed split both players still list. */
+   live lists (spelling variants are matched through the aliases in item-stats.json). A clash with no agreed split is flagged as Undecided. */
 function liveClashes(){
   const by=new Map();
   for(const it of S.items){const st=statsFor(it.name);const n=normName(st?st.name:it.name);if(!n)continue;
@@ -441,10 +440,8 @@ function clashRows(){
   const byName=new Map(clashes.map(c=>[normName(c.name),c]));
   const nameCell=n=>statsFor(n)?tipBtn(n):esc(n);
   const rows=SPLIT.map(([it,k,t])=>{
-    const c=byName.get(normName(it));byName.delete(normName(it));
-    const others=c?whoList(c.who).filter(w=>w!==k):[];
-    const warn=others.length?`<div class="clash-warn">Still on ${others.map(w=>esc(CH[w].name)).join(' and ')}'s list too.</div>`:'';
-    return `<tr><td>${nameCell(it)}</td><td>${chip(k)}</td><td>${esc(t)}${warn}</td></tr>`;});
+    byName.delete(normName(it));
+    return `<tr><td>${nameCell(it)}</td><td>${chip(k)}</td><td>${esc(t)}</td></tr>`;});
   for(const c of byName.values())
     rows.push(`<tr class="clash-new"><td>${nameCell(c.name)}</td><td><span class="clash-tag">Undecided</span></td><td>On the ${whoList(c.who).map(w=>chip(w)).join(' and ')} lists. Pick who takes it.</td></tr>`);
   return rows.join('');
