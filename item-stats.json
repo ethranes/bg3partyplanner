@@ -473,7 +473,10 @@
   ],
   "description": "Darker than a starless night, Night Walkers are made for secrecy in the honour of Shar.",
   "weight": "0.55 kg",
-  "price": "360 gp"
+  "price": "360 gp",
+  "aliases": [
+   "Disintegrating Nightwalkers"
+  ]
  },
  "Gloves of Belligerent Skies": {
   "name": "Gloves of Belligerent Skies",
@@ -1047,7 +1050,10 @@
   ],
   "description": "Clever enchantments dance between the grooves of this shield, which emanates a magic of heightened awareness.",
   "weight": "2.7 kg",
-  "price": "580 gp"
+  "price": "580 gp",
+  "aliases": [
+   "Sentinal Shield"
+  ]
  },
  "Shapeshifter Hat": {
   "name": "Shapeshifter Hat",
@@ -1359,5 +1365,388 @@
   "description": "Likely originated in Icewind Dale, where tempers run as hot as hearths, and frozen rivers trace the arm of the dale…",
   "weight": "0.5 kg",
   "price": "90 gp"
+ },
+ "Gloves of Archery": {
+  "name": "Gloves of Archery",
+  "wiki": "https://bg3.wiki/wiki/Gloves_of_Archery",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Gloves",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Corellon's Guiding Hand",
+    "text": "You gain Proficiency with Longbows and Shortbows. In addition, your ranged weapon attacks deal an additional 2 damage."
+   }
+  ],
+  "grants": [],
+  "description": "Banded in dark iron, these gloves are embossed with the brass likeness of an elf against a trio of arrows in flight.",
+  "weight": "0.5 kg",
+  "price": "60 gp"
+ },
+ "Strange Conduit Ring": {
+  "name": "Strange Conduit Ring",
+  "wiki": "https://bg3.wiki/wiki/Strange_Conduit_Ring",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Ring",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Strange Conduit",
+    "text": "When Concentrating on a spell, the wearer's weapon attacks deal an additional 1d4 Psychic damage."
+   }
+  ],
+  "grants": [],
+  "description": "In his speculative writing on arcane displacement, the wizard Tenser notes the possibility for keenly focused minds to…",
+  "weight": "0.05 kg",
+  "price": "40 gp"
+ },
+ "Caustic Band": {
+  "name": "Caustic Band",
+  "wiki": "https://bg3.wiki/wiki/Caustic_Band",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Ring",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Malefic Excretion",
+    "text": "Your weapon attacks also deal 2 Acid damage. Applies to melee, ranged and thrown weapons, but not unarmed strikes."
+   }
+  ],
+  "grants": [],
+  "description": "Adjusting this unassuming ring on your finger, you hear a faint sizzle, as of pressure being released.",
+  "weight": "0.05 kg",
+  "price": "40 gp"
+ },
+ "Club of Hill Giant Strength": {
+  "name": "Club of Hill Giant Strength",
+  "wiki": "https://bg3.wiki/wiki/Club_of_Hill_Giant_Strength",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Club",
+  "enchant": null,
+  "ac": null,
+  "damage": [
+   "1d4 Bludgeoning"
+  ],
+  "properties": [
+   "Simple",
+   "Light",
+   "One-Handed",
+   "Dippable"
+  ],
+  "effects": [
+   {
+    "name": "Splinters of a Giant's Might",
+    "text": "Increases Strength to 19."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Concussive Smash",
+    "text": "Action; recharges on Short Rest. Hit an enemy with all your might to deal damage and possibly Daze them."
+   }
+  ],
+  "description": "Though this rotting chair leg doesn't look like much, every splinter vibrates with barely-contained power.",
+  "weight": "0.9 kg",
+  "price": "65 gp"
+ },
+ "Helm of Balduran": {
+  "name": "Helm of Balduran",
+  "wiki": "https://bg3.wiki/wiki/Helm_of_Balduran",
+  "found": true,
+  "rarity": "legendary",
+  "type": "Helmet",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Balduran's Vitality",
+    "text": "The helmet heals you 2 hit points at the beginning of every turn."
+   },
+   {
+    "name": "Balduran's Favour",
+    "text": "You have a +1 bonus to Armour Class and Saving Throws."
+   },
+   {
+    "name": "Stun Immunity",
+    "text": "You can't be Stunned."
+   },
+   {
+    "name": "Critical Hit Immunity",
+    "text": "Attackers can't land Critical Hits on the wearer."
+   }
+  ],
+  "grants": [],
+  "description": "This helm, worn atop the pate of Balduran the Brave, still gleams as if with the untarnished splendour of his legacy.",
+  "weight": "2 kg",
+  "price": "760 gp",
+  "aliases": [
+   "Balduran's Helm"
+  ]
+ },
+ "Boots of Striding": {
+  "name": "Boots of Striding",
+  "wiki": "https://bg3.wiki/wiki/Boots_of_Striding",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Boots",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Focused Stride",
+    "text": "When you cast a spell that requires Concentration, you gain Momentum for 1 turn. While you are concentrating, you can't be knocked Prone or moved against your will."
+   }
+  ],
+  "grants": [],
+  "description": "The metal of these greaves is comfortably warm against your shins, as though heated by your mere presence.",
+  "weight": "2 kg",
+  "price": "90 gp"
+ },
+ "Adamantine Scale Mail": {
+  "name": "Adamantine Scale Mail",
+  "wiki": "https://bg3.wiki/wiki/Adamantine_Scale_Mail",
+  "found": true,
+  "rarity": "very rare",
+  "type": "Medium Armour",
+  "enchant": null,
+  "ac": 16,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Magical Plate",
+    "text": "All incoming damage is reduced by 1."
+   },
+   {
+    "name": "Adamantine Backlash",
+    "text": "When a melee attack hits you, the attacker is sent Reeling for 2 turns."
+   },
+   {
+    "name": "Critical Hit Immunity",
+    "text": "Attackers can't land Critical Hits on the wearer."
+   },
+   {
+    "name": "Stealth Disadvantage",
+    "text": "Disadvantage on Stealth checks."
+   }
+  ],
+  "grants": [],
+  "description": "The adamantine scales hug your body like a second skin - a heavy, near-impregnable skin.",
+  "weight": "12 kg",
+  "price": "1300 gp"
+ },
+ "Wondrous Gloves": {
+  "name": "Wondrous Gloves",
+  "wiki": "https://bg3.wiki/wiki/Wondrous_Gloves",
+  "found": true,
+  "rarity": "rare",
+  "type": "Gloves",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Troubadour's Wonder",
+    "text": "Your Armour Class increases by 1. In addition, if you have Bardic Inspiration, you gain 1 more use of it."
+   }
+  ],
+  "grants": [],
+  "description": "A series of motivational quotes have been enthusiastically removed from the embroidery of these gloves, as if in protest.",
+  "weight": "0.5 kg",
+  "price": "160 gp",
+  "aliases": [
+   "Wonderous Gloves"
+  ]
+ },
+ "Sylvan Scimitar": {
+  "name": "Sylvan Scimitar",
+  "wiki": "https://bg3.wiki/wiki/Sylvan_Scimitar",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Scimitar",
+  "enchant": "+1",
+  "ac": null,
+  "damage": [
+   "1d6 + 1 Slashing"
+  ],
+  "properties": [
+   "Martial",
+   "Finesse",
+   "Light",
+   "One-Handed",
+   "Dippable"
+  ],
+  "effects": [
+   {
+    "name": "Melee Caster",
+    "text": "Instead of its Dexterity Modifier, the wielder adds their Spellcasting Ability Modifier to Attack Rolls."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Flourish",
+    "text": "Bonus Action; recharges on Short Rest. Feint an attack to possibly leave the target Off Balance."
+   },
+   {
+    "name": "Lacerate",
+    "text": "Action; recharges on Short Rest. Slash at your target's vital points to make it Bleed."
+   }
+  ],
+  "description": "Everything moves strangely in the Feywild, from rivers to behaviours.",
+  "weight": "1.35 kg",
+  "price": "65 gp"
+ },
+ "Defender Flail": {
+  "name": "Defender Flail",
+  "wiki": "https://bg3.wiki/wiki/Defender_Flail",
+  "found": true,
+  "rarity": "rare",
+  "type": "Flail",
+  "enchant": "+1",
+  "ac": null,
+  "damage": [
+   "1d8 + 1 Bludgeoning"
+  ],
+  "properties": [
+   "Martial",
+   "One-Handed",
+   "Dippable"
+  ],
+  "effects": [
+   {
+    "name": "Armour Class",
+    "text": "Armour Class +1."
+   },
+   {
+    "name": "Steel Physiology",
+    "text": "Reduce incoming Bludgeoning, Piercing and Slashing damage by 1."
+   },
+   {
+    "name": "Tenacity",
+    "text": "When you miss a melee attack, you deal Strength Modifier Bludgeoning damage (minimum of 1) anyway."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Concussive Smash",
+    "text": "Action; recharges on Short Rest. Hit an enemy with all your might to deal damage and possibly Daze them."
+   },
+   {
+    "name": "Weakening Strike",
+    "text": "Action; recharges on Short Rest. Target an enemy's hands with a non-lethal attack and possibly inflict Weak Grip."
+   }
+  ],
+  "description": "This flail was created to commemorate victory over the devil Belhifet. The locals of Easthaven have largely forgotten its origin.",
+  "weight": "0.9 kg",
+  "price": "310 gp"
+ },
+ "Potion of Everlasting Vigour": {
+  "name": "Potion of Everlasting Vigour",
+  "wiki": "https://bg3.wiki/wiki/Potion_of_Everlasting_Vigour",
+  "found": true,
+  "rarity": "common",
+  "type": "Potion",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [
+   "Single Use"
+  ],
+  "effects": [
+   {
+    "name": "Everlasting Vigour",
+    "text": "Drink to permanently increase your Strength by 2."
+   }
+  ],
+  "grants": [],
+  "description": "Vampirism has sometimes been called the Dark Gift, or the Dark Kiss…",
+  "weight": "0.1 kg",
+  "price": "10 gp"
+ },
+ "Vivacious Cloak": {
+  "name": "Vivacious Cloak",
+  "wiki": "https://bg3.wiki/wiki/Vivacious_Cloak",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Cloak",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Arcane Vivaciousness",
+    "text": "You gain 8 temporary hit points after casting a spell while in melee."
+   }
+  ],
+  "grants": [],
+  "description": "The sheer mortal terror of the low-vitality spellcaster (who can be blown over by a wafted spoon) can be partially…",
+  "weight": "0.5 kg",
+  "price": "70 gp"
+ },
+ "Shapeshifter's Boon Ring": {
+  "name": "Shapeshifter's Boon Ring",
+  "wiki": "https://bg3.wiki/wiki/Shapeshifter%27s_Boon_Ring",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Ring",
+  "enchant": null,
+  "ac": null,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Shapeshifter's Boon",
+    "text": "While shapeshifted or disguised, you gain a +1d4 bonus to all Ability Checks."
+   }
+  ],
+  "grants": [],
+  "description": "I'm a talented shapeshifter too. I can shapeshift a thin body into a fat body.",
+  "weight": "0.05 kg",
+  "price": "70 gp"
+ },
+ "Absolute's Warboard": {
+  "name": "Absolute's Warboard",
+  "wiki": "https://bg3.wiki/wiki/Absolute%27s_Warboard",
+  "found": true,
+  "rarity": "uncommon",
+  "type": "Shield",
+  "enchant": null,
+  "ac": 2,
+  "damage": [],
+  "properties": [],
+  "effects": [
+   {
+    "name": "Absolute's Ward",
+    "text": "If the wielder bears the Absolute's Brand, they gain a +1 bonus to Saving Throws."
+   }
+  ],
+  "grants": [
+   {
+    "name": "Heroism",
+    "text": "Cast as a level 1 spell; recharges on Long Rest."
+   }
+  ],
+  "description": "Blood is smeared across the shield's face, exalting wielders who bear the Absolute's mark.",
+  "weight": "2.7 kg",
+  "price": "70 gp"
  }
 }

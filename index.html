@@ -292,7 +292,7 @@ C:{role:'Healing, buffs, control',line:'Storm Sorcerer 1 / Light Domain Cleric 1
  levels:[['01','Cleric 1','<b>Light Domain</b>. Warding Flare, Light, Burning Hands, Faerie Fire.'],['02','Cleric 2','Radiance of the Dawn, Turn Undead.'],['03','Cleric 3','Flaming Sphere and Scorching Ray (free). Prepare Spiritual Weapon, Lesser Restoration, Hold Person.'],['04','Cleric 4','Cantrip: Thaumaturgy. Feat: <b>+2 WIS</b>.'],['05','Cleric 5','Prepare <b>Spirit Guardians, Glyph of Warding, Mass Healing Word</b>. Fireball and Daylight are free.'],['06','Sorcerer 1','Respec: <b>Storm Sorcery</b> at level 1, then Cleric 1–5 again. CON save proficiency. Sorcerer cantrips the Cleric lacks (Mage Hand, Friends, Bone Chill or Fire Bolt) and Shield.'],['07','Cleric 6','Improved Warding Flare (protect allies).'],['08','Cleric 7','Wall of Fire and Guardian of Faith (free). Prepare Banishment, Death Ward.'],['09','Cleric 8','Potent Spellcasting. Feat: <b>+1 WIS</b> (to 20) and +1 to another ability.'],['10','Cleric 9','Flame Strike, Destructive Wave (free). Prepare Greater Restoration, Planar Binding, Mass Cure Wounds.'],['11','Cleric 10','Divine Intervention (once per playthrough; save it for Honour Mode). One more cantrip.'],['12','Cleric 11','Prepare <b>Heroes\' Feast</b>, Planar Ally, Harm, Blade Barrier.']],
  extra:['Party notes',['Hood of the Weave and Cloak of the Weave go to the Sorcerer, so keep the Holy Lance Helm and Thunderskin Cloak.','<b>Create Water</b> on a group sets up the Sorcerer\'s cold damage.']]}};
 
-const SPLIT=[['Boots of Stormy Clamour','C','Sorcerer wears Disintegrating Night Walkers instead.'],['Hood of the Weave','S','Cleric keeps the Holy Lance Helm; it feeds the Reverberation combo.'],['Cloak of the Weave','S','Cleric wears the Thunderskin Cloak.'],["Ketheric's Shield",'S',"Cleric uses the Sentinel Shield, then Viconia's Walking Fortress."],['Cloak of Displacement','A',"The Assassin's old Cloak of Protection goes to whoever has no cloak yet."],['Ring of Protection','D',"The tank gets the AC. Sorcerer takes Crusher's Ring."],['Bow of Awareness','C','Sorcerer gets initiative from the Alert feat instead.'],['Callous Glow Ring','C',"Core to the Cleric's radiant combo."],['Adamantine Forge','D','Two crafts: a Scimitar for the Druid and a Shield for the Cleric.'],['Mirror of Loss (+2 stat)','S','Both caster guides want it (CHA for the Sorcerer, WIS for the Cleric). Decide before you get there.']];
+const SPLIT=[['Boots of Stormy Clamour','C','Sorcerer was going to wear the Disintegrating Night Walkers, but those are on the Assassin\'s list now, so the Sorcerer needs other boots.'],['Hood of the Weave','S','Cleric keeps the Holy Lance Helm; it feeds the Reverberation combo.'],['Cloak of the Weave','S','Cleric wears the Thunderskin Cloak.'],["Ketheric's Shield",'S',"Cleric uses the Sentinel Shield, then Viconia's Walking Fortress."],['Cloak of Displacement','A',"The Assassin's old Cloak of Protection goes to whoever has no cloak yet."],['Ring of Protection','D',"The tank gets the AC. Sorcerer takes Crusher's Ring."],['Bow of Awareness','C','The Cleric already has it. The Sorcerer gets initiative from the Alert feat instead.'],['Callous Glow Ring','C',"Core to the Cleric's radiant combo."],['Adamantine Forge','D','Two crafts: Scale Mail for the Druid and a Shield for the Cleric.'],['Mirror of Loss (+2 stat)','S','Both caster guides want it (CHA for the Sorcerer, WIS for the Cleric). Decide before you get there.']];
 
 /* ---------- state ---------- */
 const S={stops:[],items:[],players:{},fights:{},db:null,status:'connecting',loaded:{stops:false,items:false},editing:false,arrange:false,confirmDel:null,pass:null};
@@ -427,11 +427,11 @@ function loadingOr(html){
 }
 
 /* Contested gear: the agreed splits in SPLIT, plus any item that is on two or more characters'
-   live lists. A clash with no agreed split is flagged; so is an agreed split both players still list. */
+   live lists (spelling variants are matched through the aliases in item-stats.json). A clash with no agreed split is flagged; so is an agreed split both players still list. */
 function liveClashes(){
   const by=new Map();
-  for(const it of S.items){const n=normName(it.name);if(!n)continue;
-    if(!by.has(n))by.set(n,{name:it.name,who:new Set()});by.get(n).who.add(it.who);}
+  for(const it of S.items){const st=statsFor(it.name);const n=normName(st?st.name:it.name);if(!n)continue;
+    if(!by.has(n))by.set(n,{name:st?st.name:it.name,who:new Set()});by.get(n).who.add(it.who);}
   return [...by.values()].filter(c=>c.who.size>1);
 }
 const WHO_ORDER='SDAC';
@@ -860,7 +860,7 @@ document.addEventListener('input',e=>{
 
 /* ---------- boot ---------- */
 render();
-fetch('item-stats.json').then(r=>r.ok?r.json():{}).then(d=>{STATS={};for(const s of Object.values(d))STATS[normName(s.name)]=s;render();}).catch(()=>{});
+fetch('item-stats.json').then(r=>r.ok?r.json():{}).then(d=>{STATS={};for(const s of Object.values(d))for(const n of [s.name,...(s.aliases||[])])STATS[normName(n)]=s;render();}).catch(()=>{});
 S.pass=loadPass();
 try{S.editing=!!S.pass&&localStorage.getItem(EDIT_KEY)!=='0';}catch(e){}
 const MAP={
